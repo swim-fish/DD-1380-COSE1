@@ -7,7 +7,6 @@ const STATIC_CACHE_NAME = 'tccc-static-v1';
 // 這些是在 Service Worker 安裝時必須快取的核心資源。
 // 如果其中任何一個檔案快取失敗，整個安裝過程都會失敗。
 const URLS_TO_CACHE = [
-  '/', // 代表根目錄的請求，通常對應 index.html
   'index.html', // 明確地快取主檔案
   'manifest.json',
   'icons/icon-192.png',
