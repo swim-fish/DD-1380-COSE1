@@ -896,34 +896,31 @@
 
         // 檢查更新的函式 (由按鈕觸發)
         async function checkForUpdate() {
-            if (!swRegistration) {
-                alert('Service Worker 尚未準備就緒，請稍後再試。');
+            // 透過 navigator.serviceWorker.getRegistration() 獲取當前最新的註冊物件
+            const registration = await navigator.serviceWorker.getRegistration();
+
+            if (!registration) {
+                alert('找不到有效的 Service Worker 註冊。');
                 return;
             }
             
             // alert('正在檢查更新...');
             
             try {
-                // 主動觸發瀏覽器檢查 service worker 檔案的更新
-                await swRegistration.update();
+                // 在最新的註冊物件上呼叫 update()
+                await registration.update();
 
-                // 強制等待 Service Worker 註冊資訊的更新
-                // 這會讓我們取得最新的 registration 物件，其中包含了 potential `waiting` worker
-                await navigator.serviceWorker.getRegistration();
+                // 重新獲取一次註冊資訊，以檢查是否有 waiting worker
+                // 因為 update() 後，registration 物件的狀態可能已改變
+                const updatedRegistration = await navigator.serviceWorker.getRegistration();
 
-                // 重新檢查 swRegistration 物件，確保它是最新的
-                if (navigator.serviceWorker.controller) {
-                    swRegistration = await navigator.serviceWorker.getRegistration();
+                if (updatedRegistration && updatedRegistration.waiting) {
+                    // 如果有等待中的 worker，直接向它請求版本號，然後顯示橫幅
+                    console.log("發現等待中的新版本 Service Worker。");
+                    updatedRegistration.waiting.postMessage({ action: 'GET_VERSION', fromUpdateCheck: true });
+                } else {
+                    alert(`您目前使用的已是最新版本 (${currentVersion.split('-').pop() || 'unknown'})。`);
                 }
-
-
-                // // 檢查是否有新的 worker 正在等待
-                // if (swRegistration.waiting) {
-                //     // 如果有等待中的 worker，直接向它請求版本號，然後顯示橫幅
-                //     swRegistration.waiting.postMessage({ action: 'GET_VERSION', fromUpdateCheck: true });
-                // } else {
-                //     alert(`您目前使用的已是最新版本 (${currentVersion.split('-').pop() || 'unknown'})。`);
-                // }
             } catch (error) {
                 alert('檢查更新失敗：' + error);
                 console.error('Error during update check:', error);
