@@ -523,7 +523,10 @@
 
     <script>
         // --- START: QR Code 掃描相關函式 (保持不變) ---
-        let codeReader = null; 
+        let codeReader = null;
+
+        let currentName = '';
+        let currentServiceNumber = '';
 
         async function startCamera() {
             try {
@@ -728,6 +731,9 @@
             document.getElementById('compressedSize').textContent = compressedSize;
             document.getElementById('compressionRatio').textContent = Math.round((1 - compressedSize / originalSize) * 100) + '%';
             
+            currentName = tcccData.patient.name;
+            currentServiceNumber = tcccData.patient.serviceNumber;
+
             document.getElementById('qrcode').innerHTML = '';
             new QRCode(document.getElementById('qrcode'), {
                 text: qrData, width: 300, height: 300,
@@ -749,7 +755,8 @@
             const canvas = document.querySelector('#qrcode canvas');
             if (canvas) {
                 const link = document.createElement('a');
-                link.download = 'TCCC_QRCode_' + new Date().getTime() + '.png';
+                const fileName = `TCCC_QR_${currentName.replace(/\s/g, '_')}_${currentServiceNumber.replace(/\s/g, '_')}_`;
+                link.download = fileName + new Date().getTime() + '.png';
                 link.href = canvas.toDataURL();
                 link.click();
             }
@@ -845,10 +852,15 @@
             document.getElementById('evacPriority').value = data.evacuation.priority || '';
             document.getElementById('medicName').value = data.evacuation.medicName || '';
         }
+
+        function getCurrentDate() {
+            return new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        }
+
         function loadSampleData() {
             const sampleData = {
                 name: '王大明', serviceNumber: 'TW-2024-0001', bloodType: 'O+',
-                allergies: 'Penicillin', injuryTime: new Date().toISOString().slice(0, 16),
+                allergies: 'Penicillin', injuryTime: getCurrentDate(),
                 mechanism: 'IED', injuryDescription: '右下肢爆炸傷，大量出血',
                 pulse: '120', bloodPressure: '90/60', respRate: '24', spo2: '92',
                 evacPriority: 'Urgent', medicName: '李醫官'
@@ -864,7 +876,7 @@
         }
 
         // 設定預設時間為現在
-        document.getElementById('injuryTime').value = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        document.getElementById('injuryTime').value = getCurrentDate();
 
         // === 使用這段新的、完整的 Service Worker 註冊與更新邏輯 ===
         let swRegistration = null; // 用於儲存 Service Worker 的註冊物件

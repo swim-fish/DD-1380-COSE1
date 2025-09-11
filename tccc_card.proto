@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+// 建議為您的 .proto 檔案定義一個 package，以避免命名衝突
+package tccc;
+
+// 主訊息，代表一張完整的 TCCC 卡片資料
+message TcccCard {
+  string version = 1;
+  // 使用 Google 提供的標準 Timestamp 類型來表示時間
+  google.protobuf.Timestamp timestamp = 2;
+  Patient patient = 3;
+  Injury injury = 4;
+  VitalSigns vitals = 5;
+  Treatments treatments = 6;
+  Evacuation evacuation = 7;
+}
+
+// 病患基本資訊
+message Patient {
+  string name = 1;
+  string service_number = 2;
+  BloodType blood_type = 3;
+  string allergies = 4;
+}
+
+// 傷勢評估
+message Injury {
+  google.protobuf.Timestamp time = 1;
+  Mechanism mechanism = 2;
+  // repeated 關鍵字表示這是一個列表 (array)
+  repeated InjuryLocation locations = 3;
+  string description = 4;
+}
+
+// 生命徵象
+message VitalSigns {
+  // 使用 sint32 來表示可能有負值的整數，或在此情境下代表可選的數值
+  // 欄位編號可以不連續
+  optional int32 pulse = 1;
+  optional string blood_pressure = 2;
+  optional int32 resp_rate = 3;
+  optional int32 spo2 = 4;
+}
+
+// 治療措施
+message Treatments {
+  repeated TreatmentType applied = 1;
+  string other = 2;
+}
+
+// 後送資訊
+message Evacuation {
+  EvacPriority priority = 1;
+  string medic_name = 2;
+}
+
+// --- 以下是枚舉 (Enum) 類型定義 ---
+// 為了更佳的型別安全和資料壓縮，我們將下拉選單和 checkbox 的選項定義為枚舉
+
+enum BloodType {
+  BLOOD_TYPE_UNSPECIFIED = 0;
+  A_POS = 1;
+  A_NEG = 2;
+  B_POS = 3;
+  B_NEG = 4;
+  AB_POS = 5;
+  AB_NEG = 6;
+  O_POS = 7;
+  O_NEG = 8;
+}
+
+enum Mechanism {
+  MECHANISM_UNSPECIFIED = 0;
+  GSW = 1;    // 槍傷
+  IED = 2;    // 爆炸
+  RPG = 3;    // 火箭彈
+  MVC = 4;    // 車禍
+  FALL = 5;   // 墜落
+  OTHER = 6;  // 其他
+}
+
+enum InjuryLocation {
+  INJURY_LOCATION_UNSPECIFIED = 0;
+  HEAD = 1;
+  NECK = 2;
+  CHEST = 3;
+  ABDOMEN = 4;
+  LEFT_ARM = 5;
+  RIGHT_ARM = 6;
+  LEFT_LEG = 7;
+  RIGHT_LEG = 8;
+}
+
+enum TreatmentType {
+  TREATMENT_TYPE_UNSPECIFIED = 0;
+  TOURNIQUET = 1;      // 止血帶
+  CHEST_SEAL = 2;      // 胸封
+  NPA = 3;             // 鼻咽管
+  NEEDLE_DECOMPRESSION = 4; // 胸腔減壓
+  IV_IO = 5;           // 靜脈輸液
+  MORPHINE = 6;        // 嗎啡
+  ANTIBIOTICS = 7;     // 抗生素
+  HYPOTHERMIA_PREVENTION = 8; // 保溫
+}
+
+enum EvacPriority {
+  EVAC_PRIORITY_UNSPECIFIED = 0;
+  URGENT = 1;    // 緊急
+  PRIORITY = 2;  // 優先
+  ROUTINE = 3;   // 例行
+}
+
+// 為了使用 google.protobuf.Timestamp，需要在編譯時引入 google/protobuf/timestamp.proto
+// 在 JavaScript 中，通常由函式庫處理
+// import "google/protobuf/timestamp.proto";
