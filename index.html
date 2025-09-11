@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DD Form 1380 TCCC 數位簽章 QR Code 系統</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/3.45.1/minified.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cbor-x@1.6.0/dist/index.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+        }
+        
+        .form-section h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group-justify {
+            justify-content: space-between;
+        }
+        
+        label {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        textarea {
+            min-height: 100%;
+            resize: vertical;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .output-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+        
+        .output-section h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+        
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+        }
+        
+        .data-display {
+            background: #2d3748;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 5px;
+        }
+        
+        .injury-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .body-diagram {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            min-height: 200px;
+            background: #f7fafc;
+        }
+        
+        .treatment-checklist {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        /* 新增攝影機畫面樣式 */
+        #videoContainer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        #video {
+            width: 80%;
+            max-width: 640px;
+            height: auto;
+            border: 2px solid white;
+            background: #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="videoContainer" style="display: none;">
+        <video id="video"></video>
+        <button onclick="stopCamera()" style="margin-top: 20px; background: #e53e3e;">關閉相機</button>
+    </div>
+
+    <div class="container">
+        <h1>DD Form 1380 TCCC 數位簽章 QR Code 系統</h1>
+        
+        <div class="card">
+            <form id="tcccForm">
+                <div class="form-section" style="background: #f0f9ff; padding: 20px; border-radius: 10px; margin-bottom: 25px;">
+                    <h3 style="text-align: center; color: #0369a1; margin-bottom: 15px;">快速操作</h3>
+                    <div class="button-group">
+                        <button type="button" onclick="startCamera()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            🎥 開啟相機掃描
+                        </button>
+                        <button type="button" onclick="document.getElementById('formFileInput').click()" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                            📂 上傳 QR Code 圖片
+                        </button>
+                        <input type="file" id="formFileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+                        <button type="button" onclick="loadSampleData()" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                            📋 載入範例資料
+                        </button>
+                        <button type="button" id="check-update-btn" onclick="checkForUpdate()" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">
+                            🔄 更新程式
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>基本資訊 Basic Information</h3>
+                    <div class="form-grid">
+                        <div class="form-group form-group-justify">
+                            <label>姓名 Name</label>
+                            <input type="text" id="name" required>
+                        </div>
+                        <div class="form-group form-group-justify">
+                            <label>軍籍/身份證/護照  Mil ID/National ID/Passport</label>
+                            <input type="text" id="serviceNumber" required>
+                        </div>
+                        <div class="form-group form-group-justify">
+                            <label>血型 Blood Type</label>
+                            <select id="bloodType" required>
+                                <option value="">選擇血型</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+                        <div class="form-group form-group-justify">
+                            <label>過敏史 Allergies</label>
+                            <input type="text" id="allergies" placeholder="無過敏請填 NKDA">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>傷勢評估 Injury Assessment</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>受傷時間 Time of Injury</label>
+                            <input type="datetime-local" id="injuryTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label>受傷機制 Mechanism of Injury</label>
+                            <select id="mechanism" required>
+                                <option value="">選擇</option>
+                                <option value="GSW">槍傷 GSW</option>
+                                <option value="IED">爆炸 IED</option>
+                                <option value="RPG">火箭彈 RPG</option>
+                                <option value="MVC">車禍 MVC</option>
+                                <option value="Fall">墜落 Fall</option>
+                                <option value="Other">其他 Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="injury-section">
+                        <div class="form-group">
+                            <label>傷勢部位 Injury Location</label>
+                            <div class="body-diagram">
+                                <p style="color: #718096;">身體部位示意圖</p>
+                                <div class="treatment-checklist">
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="head" name="injury">
+                                        <label for="head">頭部 Head</label>
+                                    </div>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="neck" name="injury">
+                                        <label for="neck">頸部 Neck</label>
+                                    </div>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="chest" name="injury">
+                                        <label for="chest">胸部 Chest</label>
+                                    </div>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="abdomen" name="injury">
+                                        <label for="abdomen">腹部 Abdomen</label>
+                                    </div>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="leftArm" name="injury">
+                                        <label for="leftArm">左臂 L-Arm</label>
+                                    </div>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="rightArm" name="injury">
+                                        <label for="rightArm">右臂 R-Arm</label>
+                                    </div>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="leftLeg" name="injury">
+                                        <label for="leftLeg">左腿 L-Leg</label>
+                                    </div>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="rightLeg" name="injury">
+                                        <label for="rightLeg">右腿 R-Leg</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>傷勢描述 Injury Description</label>
+                            <textarea id="injuryDescription" placeholder="詳細描述傷勢..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>生命徵象 Vital Signs</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>脈搏 Pulse (bpm)</label>
+                            <input type="number" id="pulse" min="0" max="300">
+                        </div>
+                        <div class="form-group">
+                            <label>血壓 Blood Pressure (mmHg)</label>
+                            <input type="text" id="bloodPressure" placeholder="120/80">
+                        </div>
+                        <div class="form-group">
+                            <label>呼吸 Respiratory Rate (bpm)</label>
+                            <input type="number" id="respRate" min="0" max="60">
+                        </div>
+                        <div class="form-group">
+                            <label>血氧 SpO2 (%)</label>
+                            <input type="number" id="spo2" min="0" max="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>治療措施 Treatments</h3>
+                    <div class="treatment-checklist">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="tourniquet" name="treatment">
+                            <label for="tourniquet">止血帶 Tourniquet</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="chestSeal" name="treatment">
+                            <label for="chestSeal">胸封 Chest Seal</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="npa" name="treatment">
+                            <label for="npa">鼻咽管 NPA</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="decompress" name="treatment">
+                            <label for="decompress">胸腔減壓 Needle Decompression</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iv" name="treatment">
+                            <label for="iv">靜脈輸液 IV/IO</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="morphine" name="treatment">
+                            <label for="morphine">嗎啡 Morphine</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="antibiotics" name="treatment">
+                            <label for="antibiotics">抗生素 Antibiotics</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="hypothermia" name="treatment">
+                            <label for="hypothermia">保溫 Hypothermia Prevention</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>其他治療 Other Treatments</label>
+                        <textarea id="otherTreatments" placeholder="其他治療措施..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>後送資訊 Evacuation Info</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>後送優先級 Evacuation Priority</label>
+                            <select id="evacPriority" required>
+                                <option value="">選擇</option>
+                                <option value="Urgent">緊急 Urgent</option>
+                                <option value="Priority">優先 Priority</option>
+                                <option value="Routine">例行 Routine</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>救護員 Medic Name</label>
+                            <input type="text" id="medicName" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit">生成 QR Code</button>
+                    <button type="button" onclick="clearForm()">清除表單</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card output-section" id="outputSection" style="display: none;">
+            <h3>📊 處理結果</h3>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="originalSize">0</div>
+                    <div class="stat-label">原始大小 (bytes)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="compressedSize">0</div>
+                    <div class="stat-label">壓縮後大小 (bytes)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="compressionRatio">0%</div>
+                    <div class="stat-label">壓縮率</div>
+                </div>
+            </div>
+
+            <h4 style="margin-top: 20px;">結構化資料 (JSON)</h4>
+            <div class="data-display" id="jsonData"></div>
+            
+            <h4>COSE Sign1 簽章資料 (Base64URL)</h4>
+            <div class="data-display" id="signedData"></div>
+            
+            <h4>Base45 編碼</h4>
+            <div class="data-display" id="base45Data"></div>
+            
+            <h4>QR Code</h4>
+            <div id="qrcode"></div>
+            
+            <div class="button-group">
+                <button onclick="downloadQRCode()">下載 QR Code</button>
+                <button onclick="verifyData()">驗證簽章</button>
+            </div>
+        </div>
+
+        <div class="card" id="scanResult" style="display: none; margin-top: 20px;">
+             <div id="decodedData"></div>
+        </div>
+    </div>
+
+    </div> <div id="update-notification" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #2d3748; color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000; align-items: center;">
+        <span style="margin-right: 20px;">有新版本可用！</span>
+        <button id="update-button" style="background: #667eea; border: none; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer;">立即更新</button>
+    </div>
+
+    <div id="version-display" style="position: fixed; bottom: 5px; right: 10px; font-size: 12px; color: rgba(255, 255, 255, 0.5); z-index: 1001;">
+        Loading version...
+    </div>
+
+    <script>
+        // --- START: QR Code 掃描相關函式 (保持不變) ---
+        let codeReader = null; 
+
+        async function startCamera() {
+            try {
+                codeReader = new ZXing.BrowserMultiFormatReader();
+                const videoInputDevices = await codeReader.listVideoInputDevices();
+                
+                if (videoInputDevices.length <= 0) throw new Error("找不到攝影機裝置");
+
+                const selectedDeviceId = videoInputDevices[0].deviceId;
+                document.getElementById('videoContainer').style.display = 'flex';
+
+                codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+                    if (result) {
+                        console.log("找到 QR Code:", result.text);
+                        processQRCode(result.text);
+                        stopCamera();
+                    }
+                    if (err && !(err instanceof ZXing.NotFoundException)) {
+                        console.error("解碼錯誤:", err);
+                        alert('掃描發生錯誤: ' + err);
+                        stopCamera();
+                    }
+                });
+            } catch (error) {
+                alert('無法啟動相機：' + error.message);
+                console.error('Camera error:', error);
+                stopCamera();
+            }
+        }
+
+        function stopCamera() {
+            if (codeReader) {
+                codeReader.reset();
+                codeReader = null;
+            }
+            document.getElementById('videoContainer').style.display = 'none';
+        }
+
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                const codeReaderForFile = new ZXing.BrowserMultiFormatReader();
+                const imageUrl = URL.createObjectURL(file);
+                const result = await codeReaderForFile.decodeFromImageUrl(imageUrl);
+                processQRCode(result.getText());
+                URL.revokeObjectURL(imageUrl);
+            } catch (error) {
+                alert('無法讀取 QR Code：' + error.message);
+                console.error('Scan error:', error);
+            } finally {
+                event.target.value = null;
+            }
+        }
+        // --- END: QR Code 掃描相關函式 ---
+
+        // --- START: Web Crypto and COSE Sign1 - PURE BINARY FLOW ---
+
+        // 輔助函式：String to ArrayBuffer
+        function str2ab(str) {
+            return new TextEncoder().encode(str);
+        }
+
+        // 取得或產生新的金鑰對 (保持不變)
+        async function getOrGenerateKeys() {
+            const storedKeys = JSON.parse(sessionStorage.getItem('tcccKeys'));
+            if (storedKeys) {
+                const privateKey = await crypto.subtle.importKey("jwk", storedKeys.privateKey, { name: "ECDSA", namedCurve: "P-256" }, true, ["sign"]);
+                const publicKey = await crypto.subtle.importKey("jwk", storedKeys.publicKey, { name: "ECDSA", namedCurve: "P-256" }, true, ["verify"]);
+                return { privateKey, publicKey };
+            }
+            const keyPair = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
+            const exportedPrivateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
+            const exportedPublicKey = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
+            sessionStorage.setItem('tcccKeys', JSON.stringify({
+                privateKey: exportedPrivateKey,
+                publicKey: exportedPublicKey
+            }));
+            console.log("New key pair generated and stored in sessionStorage.");
+            return keyPair;
+        }
+
+        // [新版] 建立 COSE Sign1 簽章，回傳純二進位 Uint8Array
+        async function createCOSESign1(payload) {
+            const { privateKey } = await getOrGenerateKeys();
+            
+            const protectedHeader = { alg: -7, kid: "TCCC-2025-001" }; // ES256
+            const protectedHeaderBytes = str2ab(JSON.stringify(protectedHeader));
+            const payloadBytes = CBOR.encode(payload);
+
+            const sigStructure = new Uint8Array([
+                ...str2ab('Signature1'),
+                ...protectedHeaderBytes,
+                ...payloadBytes
+            ]);
+
+            const signature = await crypto.subtle.sign(
+                { name: "ECDSA", hash: { name: "SHA-256" } },
+                privateKey,
+                sigStructure
+            );
+            
+            // 建立 COSE_Sign1 結構: 一個包含4個元素的 CBOR 陣列
+            // [ protected_header, unprotected_header, payload, signature ]
+            const coseSign1Array = [
+                protectedHeaderBytes,
+                {}, // 空的 unprotected header
+                payloadBytes,
+                new Uint8Array(signature) // signature 是 ArrayBuffer，需轉為 Uint8Array
+            ];
+
+            // 將此結構用 CBOR 編碼成最終的 Uint8Array
+            return CBOR.encode(coseSign1Array);
+        }
+
+        // [新版] 獨立的簽章驗證輔助函式
+        async function verifySignature(publicKey, protectedHeaderBytes, payloadBytes, signatureBytes) {
+            const sigStructure = new Uint8Array([
+                ...str2ab('Signature1'),
+                ...protectedHeaderBytes,
+                ...payloadBytes
+            ]);
+
+            return await crypto.subtle.verify(
+                { name: "ECDSA", hash: { name: "SHA-256" } },
+                publicKey,
+                signatureBytes,
+                sigStructure
+            );
+        }
+        // --- END: Web Crypto and COSE Sign1 ---
+
+        // --- Base45 and Form Logic (大部分不變) ---
+        const BASE45_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
+        function base45Encode(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let result = '';
+            for (let i = 0; i < bytes.length; i += 2) {
+                if (i + 1 < bytes.length) {
+                    const value = bytes[i] + bytes[i + 1] * 256;
+                    result += BASE45_ALPHABET[value % 45] + BASE45_ALPHABET[Math.floor(value / 45) % 45] + BASE45_ALPHABET[Math.floor(value / (45 * 45))];
+                } else {
+                    const value = bytes[i];
+                    result += BASE45_ALPHABET[value % 45] + BASE45_ALPHABET[Math.floor(value / 45)];
+                }
+            }
+            return result;
+        }
+        function base45Decode(str) {
+            const result = [];
+            for (let i = 0; i < str.length; i += 3) {
+                if (i + 2 < str.length) {
+                    const value = BASE45_ALPHABET.indexOf(str[i]) + BASE45_ALPHABET.indexOf(str[i + 1]) * 45 + BASE45_ALPHABET.indexOf(str[i + 2]) * 45 * 45;
+                    result.push(value % 256, Math.floor(value / 256));
+                } else if (i + 1 < str.length) {
+                    const value = BASE45_ALPHABET.indexOf(str[i]) + BASE45_ALPHABET.indexOf(str[i + 1]) * 45;
+                    result.push(value);
+                }
+            }
+            return new Uint8Array(result);
+        }
+        function collectFormData() {
+            const injuries = Array.from(document.querySelectorAll('input[name="injury"]:checked')).map(cb => cb.id);
+            const treatments = Array.from(document.querySelectorAll('input[name="treatment"]:checked')).map(cb => cb.id);
+            return {
+                version: "1.0",
+                timestamp: new Date().toISOString(),
+                patient: { name: document.getElementById('name').value, serviceNumber: document.getElementById('serviceNumber').value, bloodType: document.getElementById('bloodType').value, allergies: document.getElementById('allergies').value || "NKDA" },
+                injury: { time: document.getElementById('injuryTime').value, mechanism: document.getElementById('mechanism').value, locations: injuries, description: document.getElementById('injuryDescription').value },
+                vitals: { pulse: parseInt(document.getElementById('pulse').value) || null, bloodPressure: document.getElementById('bloodPressure').value || null, respRate: parseInt(document.getElementById('respRate').value) || null, spo2: parseInt(document.getElementById('spo2').value) || null },
+                treatments: { applied: treatments, other: document.getElementById('otherTreatments').value },
+                evacuation: { priority: document.getElementById('evacPriority').value, medicName: document.getElementById('medicName').value }
+            };
+        }
+        
+        // [新版] 表單提交流程
+        document.getElementById('tcccForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const tcccData = collectFormData();
+            const jsonString = JSON.stringify(tcccData);
+            const originalSize = new TextEncoder().encode(jsonString).length;
+            
+            // 1. 建立純二進位的 COSE_Sign1 物件
+            const coseSign1Bytes = await createCOSESign1(tcccData);
+            
+            // 2. 直接壓縮此二進位物件
+            const compressed = pako.deflate(coseSign1Bytes);
+            const compressedSize = compressed.length;
+            
+            // 3. Base45 編碼
+            const base45Encoded = base45Encode(compressed);
+            const qrData = "TC1:" + base45Encoded;
+            
+            // --- 更新顯示 ---
+            document.getElementById('outputSection').style.display = 'block';
+            document.getElementById('jsonData').textContent = jsonString;
+            // 因為是二進位，signedData 區塊顯示提示訊息
+            document.getElementById('signedData').textContent = `[Binary COSE_Sign1 Data - ${coseSign1Bytes.byteLength} bytes]`;
+            document.getElementById('base45Data').textContent = qrData;
+            document.getElementById('originalSize').textContent = originalSize;
+            document.getElementById('compressedSize').textContent = compressedSize;
+            document.getElementById('compressionRatio').textContent = Math.round((1 - compressedSize / originalSize) * 100) + '%';
+            
+            document.getElementById('qrcode').innerHTML = '';
+            new QRCode(document.getElementById('qrcode'), {
+                text: qrData, width: 300, height: 300,
+                colorDark: "#000000", colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M,
+                margin: 4
+            });
+            document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        function clearForm() {
+            if (confirm('確定要清除所有資料嗎？')) {
+                document.getElementById('tcccForm').reset();
+                document.getElementById('outputSection').style.display = 'none';
+            }
+        }
+        
+        function downloadQRCode() {
+            const canvas = document.querySelector('#qrcode canvas');
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = 'TCCC_QRCode_' + new Date().getTime() + '.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            }
+        }
+        
+        // [新版] 驗證資料流程
+        async function verifyData() {
+            const base45Data = document.getElementById('base45Data').textContent;
+            try {
+                // 1. Base45 解碼 -> 2. Zlib 解壓縮 -> 得到純二進位 COSE_Sign1 物件
+                const decompressedBytes = pako.inflate(base45Decode(base45Data.replace('TC1:', '')));
+                
+                // 3. CBOR 解碼 COSE_Sign1 結構
+                const coseSign1Array = CBOR.decode(decompressedBytes);
+                const [protectedHeaderBytes, , payloadBytes, signatureBytes] = coseSign1Array;
+                
+                // 4. 驗證簽章
+                const { publicKey } = await getOrGenerateKeys();
+                const isValid = await verifySignature(publicKey, protectedHeaderBytes, payloadBytes, signatureBytes);
+
+                if (isValid) {
+                    // 5. CBOR 解碼 payload 取得原始資料
+                    const payload = CBOR.decode(payloadBytes);
+                    alert('✅ 簽章驗證成功！\n\n資料完整性已確認。');
+                    console.log('驗證的資料:', payload);
+                } else {
+                    alert('❌ 簽章驗證失敗！\n\nSignature is invalid.');
+                }
+            } catch (error) {
+                alert('❌ 資料解析失敗！\n\n' + error.message);
+                console.error(error);
+            }
+        }
+        
+        // [新版] 處理 QR Code 流程
+        async function processQRCode(qrData) {
+            try {
+                if (!qrData.startsWith('TC1:')) throw new Error('這不是有效的 TCCC QR Code');
+                
+                const decompressedBytes = pako.inflate(base45Decode(qrData.replace('TC1:', '')));
+                const coseSign1Array = CBOR.decode(decompressedBytes);
+                const [protectedHeaderBytes, , payloadBytes, signatureBytes] = coseSign1Array;
+
+                const { publicKey } = await getOrGenerateKeys();
+                const isValid = await verifySignature(publicKey, protectedHeaderBytes, payloadBytes, signatureBytes);
+
+                if (isValid) {
+                    const payload = CBOR.decode(payloadBytes);
+                    alert('✅ QR Code 讀取與驗證成功！');
+                    displayDecodedData(payload);
+                    fillFormFromData(payload);
+                } else {
+                    throw new Error('簽章驗證失敗');
+                }
+            } catch (error) {
+                alert('QR Code 解析失敗：' + error.message);
+                console.error('Process error:', error);
+            }
+        }
+
+        // --- Display and Form Fill Logic (保持不變) ---
+        function displayDecodedData(data) {
+            const scanResult = document.getElementById('scanResult');
+            const decodedData = document.getElementById('decodedData');
+            let html = `<div class="patient-card"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"><h3 style="margin: 0;">掃描結果：傷患資訊</h3><span style="padding: 5px 10px; border-radius: 15px; color: white; background-color: ${data.evacuation.priority.toLowerCase() === 'urgent' ? '#e53e3e' : '#f59e0b'};">${data.evacuation.priority}</span></div><p><strong>姓名:</strong> ${data.patient.name} | <strong>軍籍/身份證/護照:</strong> ${data.patient.serviceNumber}</p><p><strong>血型:</strong> ${data.patient.bloodType} | <strong>過敏史:</strong> ${data.patient.allergies}</p><hr style="margin: 10px 0;"><p><strong>受傷時間:</strong> ${new Date(data.injury.time).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</p><p><strong>受傷機制:</strong> ${data.injury.mechanism}</p><p><strong>受傷部位:</strong> ${data.injury.locations.join(', ')}</p><p><strong>已實施治療:</strong> ${data.treatments.applied.join(', ') || '無'}</p><hr style="margin: 10px 0;"><p><strong>救護員:</strong> ${data.evacuation.medicName} | <strong>記錄時間:</strong> ${new Date(data.timestamp).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</p></div>`;
+            decodedData.innerHTML = html;
+            scanResult.style.display = 'block';
+            scanResult.scrollIntoView({ behavior: 'smooth' });
+        }
+        function fillFormFromData(data) {
+            document.getElementById('name').value = data.patient.name || '';
+            document.getElementById('serviceNumber').value = data.patient.serviceNumber || '';
+            document.getElementById('bloodType').value = data.patient.bloodType || '';
+            document.getElementById('allergies').value = data.patient.allergies || '';
+            document.getElementById('injuryTime').value = data.injury.time || '';
+            document.getElementById('mechanism').value = data.injury.mechanism || '';
+            document.getElementById('injuryDescription').value = data.injury.description || '';
+            document.querySelectorAll('input[name="injury"]').forEach(cb => cb.checked = false);
+            data.injury.locations.forEach(location => {
+                const cb = document.getElementById(location);
+                if (cb) cb.checked = true;
+            });
+            document.getElementById('pulse').value = data.vitals.pulse || '';
+            document.getElementById('bloodPressure').value = data.vitals.bloodPressure || '';
+            document.getElementById('respRate').value = data.vitals.respRate || '';
+            document.getElementById('spo2').value = data.vitals.spo2 || '';
+            document.querySelectorAll('input[name="treatment"]').forEach(cb => cb.checked = false);
+            data.treatments.applied.forEach(treatment => {
+                const cb = document.getElementById(treatment);
+                if (cb) cb.checked = true;
+            });
+            document.getElementById('otherTreatments').value = data.treatments.other || '';
+            document.getElementById('evacPriority').value = data.evacuation.priority || '';
+            document.getElementById('medicName').value = data.evacuation.medicName || '';
+        }
+        function loadSampleData() {
+            const sampleData = {
+                name: '王大明', serviceNumber: 'TW-2024-0001', bloodType: 'O+',
+                allergies: 'Penicillin', injuryTime: new Date().toISOString().slice(0, 16),
+                mechanism: 'IED', injuryDescription: '右下肢爆炸傷，大量出血',
+                pulse: '120', bloodPressure: '90/60', respRate: '24', spo2: '92',
+                evacPriority: 'Urgent', medicName: '李醫官'
+            };
+            for (const key in sampleData) {
+                document.getElementById(key).value = sampleData[key];
+            }
+            document.getElementById('rightLeg').checked = true;
+            document.getElementById('tourniquet').checked = true;
+            document.getElementById('iv').checked = true;
+            document.getElementById('morphine').checked = true;
+            alert('✅ 範例資料已載入！您可以直接生成 QR Code 測試。');
+        }
+
+        // 設定預設時間為現在
+        document.getElementById('injuryTime').value = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+
+        // === 使用這段新的、完整的 Service Worker 註冊與更新邏輯 ===
+        let swRegistration = null; // 用於儲存 Service Worker 的註冊物件
+        let currentVersion = 'unknown';
+        let newWorkerVersion = 'unknown';
+
+        // 顯示更新橫幅的函式
+        function showUpdateBanner(registration, oldVerName, newVerName) {
+            const notification = document.getElementById('update-notification');
+            const updateButton = document.getElementById('update-button');
+            const notificationSpan = notification.querySelector('span');
+
+            const oldVerDisplay = oldVerName.split('-').pop() || 'unknown';
+            const newVerDisplay = newVerName.split('-').pop() || 'unknown';
+
+            notificationSpan.textContent = `有新版本可用！(當前: ${oldVerDisplay}, 新版: ${newVerDisplay})`;
+            notification.style.display = 'flex';
+
+            // 移除舊的事件監聽器以避免重複註冊
+            updateButton.onclick = null; 
+            updateButton.addEventListener('click', () => {
+                const waitingWorker = registration.waiting;
+                if (waitingWorker) {
+                    waitingWorker.postMessage({ action: 'SKIP_WAITING' });
+                    notification.style.display = 'none';
+                }
+            }, { once: true }); // 使用 once: true 確保事件只執行一次
+        }
+
+        // 檢查更新的函式 (由按鈕觸發)
+        async function checkForUpdate() {
+            if (!swRegistration) {
+                alert('Service Worker 尚未準備就緒，請稍後再試。');
+                return;
+            }
+            
+            // alert('正在檢查更新...');
+            
+            try {
+                // 主動觸發瀏覽器檢查 service worker 檔案的更新
+                await swRegistration.update();
+
+                // 強制等待 Service Worker 註冊資訊的更新
+                // 這會讓我們取得最新的 registration 物件，其中包含了 potential `waiting` worker
+                await navigator.serviceWorker.getRegistration();
+
+                // 重新檢查 swRegistration 物件，確保它是最新的
+                if (navigator.serviceWorker.controller) {
+                    swRegistration = await navigator.serviceWorker.getRegistration();
+                }
+
+
+                // // 檢查是否有新的 worker 正在等待
+                // if (swRegistration.waiting) {
+                //     // 如果有等待中的 worker，直接向它請求版本號，然後顯示橫幅
+                //     swRegistration.waiting.postMessage({ action: 'GET_VERSION', fromUpdateCheck: true });
+                // } else {
+                //     alert(`您目前使用的已是最新版本 (${currentVersion.split('-').pop() || 'unknown'})。`);
+                // }
+            } catch (error) {
+                alert('檢查更新失敗：' + error);
+                console.error('Error during update check:', error);
+            }
+        }
+
+
+        if ('serviceWorker' in navigator) {
+            // 監聽來自 SW 的訊息 (包含版本回覆)
+            navigator.serviceWorker.addEventListener('message', event => {
+                if (event.data && event.data.type === 'VERSION') {
+                    const versionDisplayElement = document.getElementById('version-display');
+                    const newVersionDisplay = event.data.version.split('-').pop() || 'unknown';
+                    
+                    // 如果是來自更新檢查的回覆，且有等待中的 worker
+                    if (event.data.action === 'GET_VERSION_RESPONSE_FOR_UPDATE_CHECK' && swRegistration.waiting) {
+                        // 這個版本是新 worker 的版本
+                        newWorkerVersion = event.data.version;
+                        // 顯示更新橫幅，傳入舊版本和新版本
+                        showUpdateBanner(swRegistration, currentVersion, newWorkerVersion);
+                    } else {
+                        // 這是頁面載入時的初始版本查詢，設定為 currentVersion
+                        currentVersion = event.data.version;
+                        versionDisplayElement.textContent = `Ver: ${newVersionDisplay}`;
+                    }
+                }
+            });
+
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        swRegistration = registration;
+                        console.log('Service Worker registered with scope: ', registration.scope);
+
+                        // 首次載入時，如果已有 active 的 SW，就向它請求當前版本號
+                        if (registration.active) {
+                            registration.active.postMessage({ action: 'GET_VERSION' });
+                        }
+                        
+                        // 監聽是否有新版本安裝完畢並進入等待狀態
+                        registration.addEventListener('updatefound', () => {
+                            const installingWorker = registration.installing;
+                            if (installingWorker) {
+                                installingWorker.addEventListener('statechange', () => {
+                                    if (installingWorker.state === 'installed' && swRegistration.waiting) {
+                                        // 新 worker 已安裝，但尚未啟用 (等待中)
+                                        // 向這個新的 waiting worker 請求它的版本號，然後觸發橫幅顯示
+                                        installingWorker.postMessage({ action: 'GET_VERSION', fromUpdateCheck: true });
+                                    }
+                                });
+                            }
+                        });
+                    }).catch(error => {
+                        console.log('Service Worker registration failed: ', error);
+                    });
+
+                // 監聽 Service Worker 控制器變更事件
+                // 當新的 Service Worker 接管頁面控制權時觸發
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (refreshing) return; // 防止重複重新整理
+                    refreshing = true;
+                    // 當新的 Service Worker 成為 active 的控制器後，重新載入頁面
+                    window.location.reload(); 
+                });
+            });
+        }
+    </script>
+
+</body>
+</html>
