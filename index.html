@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +10,9 @@
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
     <!-- 引入自訂外部 CSS (在 Bootstrap 之後) -->
     <link rel="stylesheet" href="style.css">
 
@@ -20,8 +22,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/3.45.1/minified.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cbor-x@1.6.0/dist/index.min.js"></script>
-    
+
 </head>
+
 <body>
     <div id="videoContainer" style="display: none;">
         <video id="video"></video>
@@ -30,143 +33,115 @@
 
     <div class="container">
         <h1>DD Form 1380 TCCC 數位簽章 QR Code 系統</h1>
-        
+
         <div class="card">
             <form id="tcccForm">
-                <div class="form-section" style="background: #f0f9ff; padding: 20px; border-radius: 10px; margin-bottom: 25px;">
+                <div class="form-section"
+                    style="background: #f0f9ff; padding: 20px; border-radius: 10px; margin-bottom: 25px;">
                     <h3 style="text-align: center; color: #0369a1; margin-bottom: 15px;">快速操作</h3>
                     <div class="button-group">
-                        <button type="button" onclick="startCamera()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                            🎥 開啟相機掃描
-                        </button>
-                        <button type="button" onclick="document.getElementById('formFileInput').click()" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
-                            📂 上傳 QR Code 圖片
-                        </button>
-                        <input type="file" id="formFileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
-                        <button type="button" onclick="loadSampleData()" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                            📋 載入範例資料
-                        </button>
-                        <button type="button" id="check-update-btn" onclick="checkForUpdate()" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">
-                            🔄 更新程式
-                        </button>
+                        <button type="button" onclick="startCamera()"
+                            style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">🎥 開啟相機掃描</button>
+                        <button type="button" onclick="document.getElementById('formFileInput').click()"
+                            style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">📂 上傳 QR Code
+                            圖片</button>
+                        <input type="file" id="formFileInput" accept="image/*" style="display: none;"
+                            onchange="handleFileSelect(event)">
+                        <button type="button" onclick="loadSampleData()"
+                            style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">📋 載入範例資料</button>
+                        <button type="button" id="check-update-btn" onclick="checkForUpdate()"
+                            style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">🔄 更新程式</button>
                     </div>
                 </div>
-                
+
                 <div class="form-section">
                     <h3>基本資訊 Basic Information</h3>
                     <div class="form-grid">
-                        <div class="form-group form-group-justify">
-                            <label for="patientBattleRoster">戰傷編號 (Battle Roster):</label>
-                            <input type="text" id="patientBattleRoster" name="patientBattleRoster" placeholder="輸入戰場傷患編號" required>
-                        </div>
-                        <div class="form-group form-group-justify">
-                            <label>姓名 Name</label>
-                            <input type="text" id="name" required>
-                        </div>
-                        
+                        <div class="form-group form-group-justify"><label for="patientBattleRoster">戰傷編號 (Battle
+                                Roster):</label><input type="text" id="patientBattleRoster" name="patientBattleRoster"
+                                placeholder="輸入戰場傷患編號" required></div>
+                        <div class="form-group form-group-justify"><label>姓名 Name</label><input type="text" id="name"
+                                required></div>
                         <div class="form-group-wrapper">
-                            <div class="form-group form-group-justify">
-                                <label>ID 末4碼  Last 4</label>
-                                <input type="text" id="idLast4" required>
-                            </div>
-                            <div class="form-group form-group-justify">
-                                <label>血型 Blood Type</label>
-                                <select id="bloodType" required>
+                            <div class="form-group form-group-justify"><label for="service">軍種 SERVICE</label><input
+                                    type="text" id="service" placeholder="例如：陸軍、海軍"></div>
+                            <div class="form-group form-group-justify"><label for="unit">單位 UNIT</label><input
+                                    type="text" id="unit" placeholder="例如：步兵101旅"></div>
+                        </div>
+                        <div class="form-group-wrapper">
+                            <div class="form-group form-group-justify"><label>ID 末4碼 Last 4</label><input type="text"
+                                    id="idLast4" required></div>
+                            <div class="form-group form-group-justify"><label>血型 Blood Type</label><select
+                                    id="bloodType" required>
                                     <option value="">選擇血型</option>
-                                    <option value="A+">A+</option> <option value="A-">A-</option>
-                                    <option value="B+">B+</option> <option value="B-">B-</option>
-                                    <option value="AB+">AB+</option> <option value="AB-">AB-</option>
-                                    <option value="O+">O+</option> <option value="O-">O-</option>
-                                </select>
-                            </div>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select></div>
                         </div>
-                    </div>
-                    <div class="form-grid">
-                        <div class="form-group-wrapper">
-                            <div class="form-group form-group-justify">
-                                <label for="service">軍種 SERVICE</label>
-                                <input type="text" id="service" placeholder="例如：陸軍、海軍">
-                            </div>
-                            <div class="form-group form-group-justify">
-                                <label for="unit">單位 UNIT</label>
-                                <input type="text" id="unit" placeholder="例如：步兵101旅">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group form-group-justify">
-                            <label>過敏史 Allergies</label>
-                            <input type="text" id="allergies" placeholder="無過敏請填 NKDA">
-                        </div>
+                        <div class="form-group form-group-justify"><label>過敏史 Allergies</label><input type="text"
+                                id="allergies" placeholder="無過敏請填 NKDA"></div>
                     </div>
                 </div>
 
                 <div class="form-section">
                     <h3>傷勢評估 Injury Assessment</h3>
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label>受傷時間 Time of Injury</label>
-                            <input type="datetime-local" id="injuryTime" required>
-                        </div>
-                        <div class="form-group">
-                            <label>受傷機制 Mechanism of Injury</label>
-                            <select id="mechanism" required>
+                        <div class="form-group"><label>受傷時間 Time of Injury</label><input type="datetime-local"
+                                id="injuryTime" required></div>
+                        <div class="form-group"><label>受傷機制 Mechanism of Injury</label><select id="mechanism" required>
                                 <option value="">選擇機制</option>
-                                <option value="Artillery">砲擊 Artillery</option> <option value="Burn">燒燙傷 Burn</option>
-                                <option value="Fall">墜落 Fall</option> <option value="Grenade">手榴彈 Grenade</option>
-                                <option value="GSW">槍傷 GSW</option> <option value="IED">爆炸裝置 IED</option>
-                                <option value="Landmine">地雷 Landmine</option> <option value="MVC">車輛事故 MVC</option>
-                                <option value="RPG">火箭彈 RPG</option> <option value="Other">其他 Other</option>
-                            </select>
-                        </div>
+                                <option value="Artillery">砲擊 Artillery</option>
+                                <option value="Burn">燒燙傷 Burn</option>
+                                <option value="Fall">墜落 Fall</option>
+                                <option value="Grenade">手榴彈 Grenade</option>
+                                <option value="GSW">槍傷 GSW</option>
+                                <option value="IED">爆炸裝置 IED</option>
+                                <option value="Landmine">地雷 Landmine</option>
+                                <option value="MVC">車輛事故 MVC</option>
+                                <option value="RPG">火箭彈 RPG</option>
+                                <option value="Other">其他 Other</option>
+                            </select></div>
                     </div>
-                    
-                    <!-- START: 新增止血帶紀錄區塊 -->
+
                     <div class="form-section" style="margin-top: 20px;">
                         <h4>止血帶紀錄 (Tourniquet Application)</h4>
                         <div class="tourniquet-section">
                             <div class="container text-center">
                                 <div class="row">
                                     <div class="col">
-                                        <!-- TQ Left Arm -->
-                                        <div class="tq-record">
-                                            <label for="tq_l_arm_type">TQ: Left Arm</label>
-                                            <div class="tq-record-inputs">
-                                                <input type="text" id="tq_l_arm_type" list="tq-types" placeholder="Type">
-                                                <input type="time" id="tq_l_arm_time">
-                                            </div>
+                                        <div class="tq-record"><label for="tq_l_arm_type">TQ: Left Arm</label>
+                                            <div class="tq-record-inputs"><input type="text" id="tq_l_arm_type"
+                                                    list="tq-types" placeholder="Type"><input type="time"
+                                                    id="tq_l_arm_time"></div>
                                         </div>
                                     </div>
                                     <div class="col">
-                                        <!-- TQ Right Arm -->
-                                        <div class="tq-record">
-                                            <label for="tq_r_arm_type">TQ: Right Arm</label>
-                                            <div class="tq-record-inputs">
-                                                <input type="text" id="tq_r_arm_type" list="tq-types" placeholder="Type">
-                                                <input type="time" id="tq_r_arm_time">
-                                            </div>
+                                        <div class="tq-record"><label for="tq_r_arm_type">TQ: Right Arm</label>
+                                            <div class="tq-record-inputs"><input type="text" id="tq_r_arm_type"
+                                                    list="tq-types" placeholder="Type"><input type="time"
+                                                    id="tq_r_arm_time"></div>
                                         </div>
-                                        
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col">
-                                        <!-- TQ Left Leg -->
-                                        <div class="tq-record">
-                                            <label for="tq_l_leg_type">TQ: Left Leg</label>
-                                            <div class="tq-record-inputs">
-                                                <input type="text" id="tq_l_leg_type" list="tq-types" placeholder="Type">
-                                                <input type="time" id="tq_l_leg_time">
-                                            </div>
+                                        <div class="tq-record"><label for="tq_l_leg_type">TQ: Left Leg</label>
+                                            <div class="tq-record-inputs"><input type="text" id="tq_l_leg_type"
+                                                    list="tq-types" placeholder="Type"><input type="time"
+                                                    id="tq_l_leg_time"></div>
                                         </div>
                                     </div>
                                     <div class="col">
-                                        <!-- TQ Right Leg -->
-                                        <div class="tq-record">
-                                            <label for="tq_r_leg_type">TQ: Right Leg</label>
-                                            <div class="tq-record-inputs">
-                                                <input type="text" id="tq_r_leg_type" list="tq-types" placeholder="Type">
-                                                <input type="time" id="tq_r_leg_time">
-                                            </div>
+                                        <div class="tq-record"><label for="tq_r_leg_type">TQ: Right Leg</label>
+                                            <div class="tq-record-inputs"><input type="text" id="tq_r_leg_type"
+                                                    list="tq-types" placeholder="Type"><input type="time"
+                                                    id="tq_r_leg_time"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -177,71 +152,66 @@
                             <option value="SAM"></option>
                         </datalist>
                     </div>
-                    <!-- END: 新增止血帶紀錄區塊 -->
 
-                    <div class="form-group" style="margin-top: 20px;">
-                        <label>傷勢描述 Injury Description</label>
-                        <textarea id="injuryDescription" placeholder="詳細描述傷勢..."></textarea>
-                    </div>
+                    <div class="form-group" style="margin-top: 20px;"><label>傷勢描述 Injury Description</label><textarea
+                            id="injuryDescription" placeholder="詳細描述傷勢..."></textarea></div>
                 </div>
 
-                <!-- 其他表單區塊... -->
                 <div class="form-section">
                     <h3>生命徵象 Vital Signs</h3>
                     <div class="form-grid">
-                        <div class="form-group"><label>脈搏 Pulse (bpm)</label><input type="number" id="pulse" min="0" max="300"></div>
-                        
-                        
-                        <!-- <div class="form-group"><label>血壓 Blood Pressure (mmHg)</label><input type="text" id="bloodPressure" placeholder="120/80"></div> -->
-                        <div class="form-group">
-                            <label>血壓 Blood Pressure (mmHg)</label>
-                            
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" placeholder="Systolic 120" aria-label="Systolic (mmHg)" id="bloodPressureSystolic">
-                                <span class="input-group-text">/</span>
-                                <input type="text" class="form-control" placeholder="Diastolic 80" aria-label="Diastolic (mmHg)" id="bloodPressureDiastolic">
-                            </div>
+                        <div class="form-group"><label>脈搏 Pulse (bpm)</label><input type="number" id="pulse" min="0"
+                                max="300"></div>
+                        <div class="form-group"><label>血壓 Blood Pressure (mmHg)</label>
+                            <div class="input-group"><input type="text" class="form-control" placeholder="Systolic 120"
+                                    aria-label="Systolic (mmHg)" id="bloodPressureSystolic"><span
+                                    class="input-group-text">/</span><input type="text" class="form-control"
+                                    placeholder="Diastolic 80" aria-label="Diastolic (mmHg)"
+                                    id="bloodPressureDiastolic"></div>
                         </div>
-                        <div class="form-group"><label>呼吸 Respiratory Rate (bpm)</label><input type="number" id="respRate" min="0" max="60"></div>
-                        <div class="form-group"><label>血氧 SpO2 (%)</label><input type="number" id="spo2" min="0" max="100"></div>
+                        <div class="form-group"><label>呼吸 Respiratory Rate (bpm)</label><input type="number"
+                                id="respRate" min="0" max="60"></div>
+                        <div class="form-group"><label>血氧 SpO2 (%)</label><input type="number" id="spo2" min="0"
+                                max="100"></div>
                     </div>
                 </div>
 
                 <div class="form-section">
                     <h3>治療措施 Treatments</h3>
-                    <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-                        <input type="checkbox" class="btn-check" name="btnradio" id="tourniquet" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="tourniquet">止血帶 Tourniquet</label>
-                        
-                        <input type="checkbox" class="btn-check" name="btnradio" id="chestSeal" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="chestSeal">胸封 Chest Seal</label>
-
-                        <input type="checkbox" class="btn-check" name="btnradio" id="npa" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="npa">鼻咽管 NPA</label>
-                        
-                        <input type="checkbox" class="btn-check" name="btnradio" id="decompress" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="decompress">胸腔減壓 Needle Decompression</label>
-                        
-                        <input type="checkbox" class="btn-check" name="btnradio" id="iv" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="iv">靜脈輸液 IV/IO</label>
-
-                        <input type="checkbox" class="btn-check" name="btnradio" id="morphine" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="morphine">嗎啡 Morphine</label>
-                        
-                        <input type="checkbox" class="btn-check" name="btnradio" id="antibiotics" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="antibiotics">抗生素 Antibiotics</label>
-
-                        <input type="checkbox" class="btn-check" name="btnradio" id="hypothermia" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="hypothermia">保溫 Hypothermia Prevention</label>
+                    <div class="btn-group flex-wrap" role="group" aria-label="Treatments toggle button group">
+                        <input type="checkbox" class="btn-check" id="tourniquet" autocomplete="off"><label
+                            class="btn btn-outline-primary" for="tourniquet">止血帶 Tourniquet</label>
+                        <input type="checkbox" class="btn-check" id="chestSeal" autocomplete="off"><label
+                            class="btn btn-outline-primary" for="chestSeal">胸封 Chest Seal</label>
+                        <input type="checkbox" class="btn-check" id="npa" autocomplete="off"><label
+                            class="btn btn-outline-primary" for="npa">鼻咽管 NPA</label>
+                        <input type="checkbox" class="btn-check" id="decompress" autocomplete="off"><label
+                            class="btn btn-outline-primary" for="decompress">胸腔減壓 Needle Decompression</label>
+                        <input type="checkbox" class="btn-check" id="iv" autocomplete="off"><label
+                            class="btn btn-outline-primary" for="iv">靜脈輸液 IV/IO</label>
+                        <input type="checkbox" class="btn-check" id="morphine" autocomplete="off"><label
+                            class="btn btn-outline-primary" for="morphine">嗎啡 Morphine</label>
+                        <input type="checkbox" class="btn-check" id="antibiotics" autocomplete="off"><label
+                            class="btn btn-outline-primary" for="antibiotics">抗生素 Antibiotics</label>
+                        <input type="checkbox" class="btn-check" id="hypothermia" autocomplete="off"><label
+                            class="btn btn-outline-primary" for="hypothermia">保溫 Hypothermia Prevention</label>
                     </div>
-                    <div class="form-group" style="margin-top: 15px;"><label>其他治療 Other Treatments</label><textarea id="otherTreatments" placeholder="其他治療措施..."></textarea></div>
+                    <div class="form-group" style="margin-top: 15px;"><label>其他治療 Other Treatments</label><textarea
+                            id="otherTreatments" placeholder="其他治療措施..."></textarea></div>
                 </div>
 
                 <div class="form-section">
                     <h3>後送資訊 Evacuation Info</h3>
                     <div class="form-grid">
-                        <div class="form-group"><label>後送優先級 Evacuation Priority</label><select id="evacPriority" required><option value="">選擇</option><option value="Urgent">緊急 Urgent</option><option value="Priority">優先 Priority</option><option value="Routine">例行 Routine</option></select></div>
-                        <div class="form-group"><label>救護員 Medic Name</label><input type="text" id="medicName" required></div>
+                        <div class="form-group"><label>後送優先級 Evacuation Priority</label><select id="evacPriority"
+                                required>
+                                <option value="">選擇</option>
+                                <option value="Urgent">緊急 Urgent</option>
+                                <option value="Priority">優先 Priority</option>
+                                <option value="Routine">例行 Routine</option>
+                            </select></div>
+                        <div class="form-group"><label>救護員 Medic Name</label><input type="text" id="medicName" required>
+                        </div>
                     </div>
                 </div>
 
@@ -258,64 +228,60 @@
                 <table class="table">
                     <thead>
                         <tr>
-                        <th scope="col"></th>
-                        <th scope="col">原始大小 (bytes)</th>
-                        <th scope="col">壓縮後大小 (bytes)</th>
-                        <th scope="col">最終 QR Code 大小 (bytes)</th>
-                        <th scope="col">壓縮率</th>
+                            <th scope="col"></th>
+                            <th scope="col">原始大小 (bytes)</th>
+                            <th scope="col">壓縮後大小 (bytes)</th>
+                            <th scope="col">最終 QR Code 大小 (bytes)</th>
+                            <th scope="col">壓縮率</th>
                         </tr>
                     </thead>
                     <tbody class="table-group-divider">
                         <tr>
-                        <th scope="row"></th>
-                        <td><div class="stat-value" id="originalSize">0</div></td>
-                        <td><div class="stat-value" id="compressedSize">0</div></td>
-                        <td><div class="stat-value" id="qrDataSize">0</div></td>
-                        <td><div class="stat-value" id="compressionRatio">0%</div></td>
+                            <th scope="row"></th>
+                            <td>
+                                <div class="stat-value" id="originalSize">0</div>
+                            </td>
+                            <td>
+                                <div class="stat-value" id="compressedSize">0</div>
+                            </td>
+                            <td>
+                                <div class="stat-value" id="qrDataSize">0</div>
+                            </td>
+                            <td>
+                                <div class="stat-value" id="compressionRatio">0%</div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-
             <h4 style="margin-top: 20px;">結構化資料 (JSON)</h4>
             <div class="data-display" id="jsonData"></div>
-            
             <h4>COSE Sign1 簽章資料 (Binary)</h4>
             <div class="data-display" id="signedData"></div>
-            
             <h4>Base45 編碼</h4>
             <div class="data-display" id="base45Data"></div>
-            
             <h4>QR Code</h4>
             <div id="qrcode" class="text-center"></div>
-            
-            <div class="button-group">
-                <button onclick="downloadQRCode()">下載 QR Code</button>
-                <button onclick="verifyData()">驗證簽章</button>
-            </div>
+            <div class="button-group"><button onclick="downloadQRCode()">下載 QR Code</button><button
+                    onclick="verifyData()">驗證簽章</button></div>
         </div>
-
         <div class="card" id="scanResult" style="display: none; margin-top: 20px;">
-             <div id="decodedData"></div>
+            <div id="decodedData"></div>
         </div>
     </div>
-
-    <div id="update-notification" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #2d3748; color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000; align-items: center;">
-        <span style="margin-right: 20px;">有新版本可用！</span>
-        <button id="update-button" style="background: #667eea; border: none; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer;">立即更新</button>
+    <div id="update-notification"
+        style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #2d3748; color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000; align-items: center;">
+        <span style="margin-right: 20px;">有新版本可用！</span><button id="update-button"
+            style="background: #667eea; border: none; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer;">立即更新</button>
     </div>
-
-    <div id="version-display" style="position: fixed; bottom: 5px; right: 10px; font-size: 12px; color: rgba(255, 255, 255, 0.5); z-index: 1001;">
-        Loading version...
-    </div>
-
-    <!-- START: 新增 Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <!-- END: 新增 Bootstrap JS -->
-
-    <!-- 引入外部 JavaScript -->
+    <div id="version-display"
+        style="position: fixed; bottom: 5px; right: 10px; font-size: 12px; color: rgba(255, 255, 255, 0.5); z-index: 1001;">
+        Loading version...</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
     <script src="app.js"></script>
 
 </body>
-</html>
 
+</html>

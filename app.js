@@ -208,16 +208,16 @@ document.getElementById('tcccForm').addEventListener('submit', async function(e)
     
     const base45Encoded = base45Encode(compressed);
     const qrData = "TC1:" + base45Encoded;
-    const qrDataSize = base45Encoded.length;
+    const qrDataSize = new TextEncoder().encode(qrData).length;
     
     document.getElementById('outputSection').style.display = 'block';
-    document.getElementById('jsonData').innerHTML  = `<pre class="overflow-auto" style="max-height: 200px;"><code>${jsonString}</code></pre>`;
-    document.getElementById('signedData').innerHTML  = `[Binary COSE_Sign1 Data - ${coseSign1Bytes.byteLength} bytes]`;
-    document.getElementById('base45Data').innerHTML  = `<pre class="overflow-auto" style="max-height: 200px;"><code>${qrData}</code></pre>`;
+    document.getElementById('jsonData').innerHTML = `<pre class="overflow-auto" style="max-height: 200px;"><code>${jsonString}</code></pre>`;
+    document.getElementById('signedData').textContent = `[Binary COSE_Sign1 Data - ${coseSign1Bytes.byteLength} bytes]`;
+    document.getElementById('base45Data').innerHTML = `<pre class="overflow-auto" style="max-height: 200px;"><code>${qrData}</code></pre>`;
     document.getElementById('originalSize').textContent = originalSize;
     document.getElementById('compressedSize').textContent = compressedSize;
-    document.getElementById('compressionRatio').textContent = Math.round((1 - compressedSize / originalSize) * 100) + '%';
     document.getElementById('qrDataSize').textContent = qrDataSize;
+    document.getElementById('compressionRatio').textContent = Math.round((1 - compressedSize / originalSize) * 100) + '%';
     
     currentName = tcccData.patient.name;
     currentidLast4 = tcccData.patient.idLast4;
@@ -226,8 +226,7 @@ document.getElementById('tcccForm').addEventListener('submit', async function(e)
     new QRCode(document.getElementById('qrcode'), {
         text: qrData, width: 300, height: 300,
         colorDark: "#000000", colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.M,
-        margin: 4
+        correctLevel: QRCode.CorrectLevel.M
     });
     document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
 });
@@ -370,31 +369,18 @@ function fillFormFromData(data) {
     document.getElementById('idLast4').value = patient.idLast4 || '';
     document.getElementById('bloodType').value = patient.bloodType || '';
     document.getElementById('allergies').value = patient.allergies || '';
+    document.getElementById('injuryTime').value = injury.time || '';
+    document.getElementById('mechanism').value = injury.mechanism || '';
+    document.getElementById('injuryDescription').value = injury.description || '';
 
-     // 填寫止血帶資料
     const tqLimbs = ['r_arm', 'r_leg', 'l_arm', 'l_leg'];
     tqLimbs.forEach(limb => {
         const tqData = injury[`tq_${limb}`];
         const typeInput = document.getElementById(`tq_${limb}_type`);
         const timeInput = document.getElementById(`tq_${limb}_time`);
-        if (tqData) {
-            typeInput.value = tqData.type || '';
-            timeInput.value = tqData.time || '';
-        } else {
-            typeInput.value = '';
-            timeInput.value = '';
-        }
-        // 觸發一次驗證
+        typeInput.value = tqData ? tqData.type || '' : '';
+        timeInput.value = tqData ? tqData.time || '' : '';
         typeInput.dispatchEvent(new Event('input'));
-    });
-    
-    document.getElementById('injuryTime').value = injury.time || '';
-    document.getElementById('mechanism').value = injury.mechanism || '';
-    document.getElementById('injuryDescription').value = injury.description || '';
-    document.querySelectorAll('input[name="injury"]').forEach(cb => cb.checked = false);
-    (injury.locations || []).forEach(location => {
-        const cb = document.getElementById(location);
-        if (cb) cb.checked = true;
     });
     
     document.getElementById('pulse').value = vitals.pulse || '';
@@ -403,10 +389,8 @@ function fillFormFromData(data) {
     document.getElementById('respRate').value = vitals.respRate || '';
     document.getElementById('spo2').value = vitals.spo2 || '';
     
-    document.querySelectorAll('input[name="treatment"]').forEach(cb => cb.checked = false);
-    (treatments.applied || []).forEach(treatment => {
-        const cb = document.getElementById(treatment);
-        if (cb) cb.checked = true;
+    document.querySelectorAll('.btn-check').forEach(cb => {
+        cb.checked = (treatments.applied || []).includes(cb.id);
     });
     document.getElementById('otherTreatments').value = treatments.other || '';
     
@@ -443,10 +427,12 @@ function loadSampleData() {
             document.getElementById(key).value = sampleData[key];
         }
     }
+    // 勾選範例治療
     document.getElementById('tourniquet').checked = true;
     document.getElementById('iv').checked = true;
     document.getElementById('morphine').checked = true;
-    // 新增範例止血帶資料
+    
+    // 填寫範例止血帶
     document.getElementById('tq_r_leg_type').value = 'CAT';
     document.getElementById('tq_r_leg_time').value = '14:30';
     document.getElementById('tq_r_leg_type').dispatchEvent(new Event('input'));
