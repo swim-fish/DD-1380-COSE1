@@ -142,21 +142,14 @@ function base45Decode(str) {
 
 
 function collectFormData() {
-    // --- START: 更新治療措施的收集方式 ---
-    // 逐一檢查每個治療措施的 ID
     const treatments = [];
-    const treatmentIds = [
-        'tourniquet', 'chestSeal', 'npa', 'decompress', 
-        'iv', 'morphine', 'antibiotics', 'hypothermia'
-    ];
-    
+    const treatmentIds = ['tourniquet', 'chestSeal', 'npa', 'decompress', 'iv', 'morphine', 'antibiotics', 'hypothermia'];
     treatmentIds.forEach(id => {
         const checkbox = document.getElementById(id);
         if (checkbox && checkbox.checked) {
             treatments.push(id);
         }
     });
-    // --- END: 更新治療措施的收集方式 ---
     
     const injuryData = {
         time: document.getElementById('injuryTime').value,
@@ -174,7 +167,7 @@ function collectFormData() {
     });
 
     return {
-        version: "1.2",
+        version: "1.3",
         timestamp: new Date().toISOString(),
         patient: { 
             battleRoster: document.getElementById('patientBattleRoster').value,
@@ -191,7 +184,9 @@ function collectFormData() {
             bloodPressureSystolic: document.getElementById('bloodPressureSystolic').value || null,
             bloodPressureDiastolic: document.getElementById('bloodPressureDiastolic').value || null,
             respRate: parseInt(document.getElementById('respRate').value) || null, 
-            spo2: parseInt(document.getElementById('spo2').value) || null 
+            spo2: parseInt(document.getElementById('spo2').value) || null,
+            avpu: document.getElementById('avpu').value || null,
+            painScale: document.getElementById('painScale').value !== '' ? parseInt(document.getElementById('painScale').value) : null
         },
         treatments: { 
             applied: treatments, 
@@ -340,6 +335,11 @@ function displayDecodedData(data) {
         tqHtml = '<p><strong>止血帶紀錄:</strong> 無</p>';
     }
 
+    let vitalsHtml = `
+        <p><strong>生命徵象:</strong> 脈搏 ${get(data, 'vitals.pulse')} | 血壓 ${get(data, 'vitals.bloodPressureSystolic')}/${get(data, 'vitals.bloodPressureDiastolic')} | 呼吸 ${get(data, 'vitals.respRate')} | 血氧 ${get(data, 'vitals.spo2')}%</p>
+        <p><strong>意識水平 (AVPU):</strong> ${get(data, 'vitals.avpu')} | <strong>疼痛指數:</strong> ${get(data, 'vitals.painScale')}</p>
+    `;
+
     let html = `
         <div class="patient-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -352,6 +352,8 @@ function displayDecodedData(data) {
             <p><strong>姓名:</strong> ${get(data, 'patient.name')} | <strong>ID 末4碼:</strong> ${get(data, 'patient.idLast4')}</p>
             <p><strong>軍種:</strong> ${get(data, 'patient.service')} | <strong>單位:</strong> ${get(data, 'patient.unit')}</p>
             <p><strong>血型:</strong> ${get(data, 'patient.bloodType')} | <strong>過敏史:</strong> ${get(data, 'patient.allergies')}</p>
+            <hr style="margin: 10px 0;">
+            ${vitalsHtml}
             <hr style="margin: 10px 0;">
             <p><strong>受傷時間:</strong> ${new Date(get(data, 'injury.time', new Date())).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</p>
             <p><strong>受傷機制:</strong> ${get(data, 'injury.mechanism')}</p>
@@ -398,6 +400,8 @@ function fillFormFromData(data) {
     document.getElementById('bloodPressureDiastolic').value = vitals.bloodPressureDiastolic || '';
     document.getElementById('respRate').value = vitals.respRate || '';
     document.getElementById('spo2').value = vitals.spo2 || '';
+    document.getElementById('avpu').value = vitals.avpu || '';
+    document.getElementById('painScale').value = vitals.painScale === null || vitals.painScale === undefined ? '' : vitals.painScale;
     
     document.querySelectorAll('.btn-check').forEach(cb => {
         cb.checked = (treatments.applied || []).includes(cb.id);
@@ -429,6 +433,8 @@ function loadSampleData() {
         bloodPressureDiastolic: '60',
         respRate: '24', 
         spo2: '92',
+        avpu: 'Pain',
+        painScale: '8',
         evacPriority: 'Urgent', 
         medicName: '李醫官'
     };
@@ -437,12 +443,10 @@ function loadSampleData() {
             document.getElementById(key).value = sampleData[key];
         }
     }
-    // 勾選範例治療
     document.getElementById('tourniquet').checked = true;
     document.getElementById('iv').checked = true;
     document.getElementById('morphine').checked = true;
     
-    // 填寫範例止血帶
     document.getElementById('tq_r_leg_type').value = 'CAT';
     document.getElementById('tq_r_leg_time').value = '14:30';
     document.getElementById('tq_r_leg_type').dispatchEvent(new Event('input'));

@@ -40,16 +40,17 @@ message Injury {
 
 message VitalSigns {
   optional int32 pulse = 1;
-  // 將 blood_pressure 分為兩個欄位
-  optional string blood_pressure_systolic = 2;  // 收縮壓
-  optional string blood_pressure_diastolic = 3; // 舒張壓
+  optional string blood_pressure_systolic = 2;
+  optional string blood_pressure_diastolic = 3;
   optional int32 resp_rate = 4;
   optional int32 spo2 = 5;
+  optional AvpuLevel avpu = 6;
+  optional int32 pain_scale = 7;
 }
 
 
 message Treatments {
-  repeated string applied = 1; // 改為 string 以儲存 ID
+  repeated string applied = 1;
   string other = 2;
 }
 
@@ -72,5 +73,13 @@ enum Mechanism {
 
 enum EvacPriority {
   EVAC_PRIORITY_UNSPECIFIED = 0; URGENT = 1; PRIORITY = 2; ROUTINE = 3;
+}
+
+enum AvpuLevel {
+  AVPU_LEVEL_UNSPECIFIED = 0;
+  ALERT = 1;
+  VERBAL = 2;
+  PAIN = 3;
+  UNRESPONSIVE = 4;
 }
 

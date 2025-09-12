@@ -173,6 +173,15 @@
                                 id="respRate" min="0" max="60"></div>
                         <div class="form-group"><label>血氧 SpO2 (%)</label><input type="number" id="spo2" min="0"
                                 max="100"></div>
+                        <div class="form-group"><label for="avpu">AVPU</label><select id="avpu" class="form-select">
+                                <option value="">選擇意識水平</option>
+                                <option value="Alert">Alert (清醒)</option>
+                                <option value="Verbal">Verbal (聲音刺激)</option>
+                                <option value="Pain">Pain (疼痛刺激)</option>
+                                <option value="Unresponsive">Unresponsive (無反應)</option>
+                            </select></div>
+                        <div class="form-group"><label for="painScale">Pain Scale (0-10)</label><input type="number"
+                                id="painScale" class="form-control" min="0" max="10" placeholder="0-10"></div>
                     </div>
                 </div>
 
