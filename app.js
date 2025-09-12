@@ -2,6 +2,7 @@
 let codeReader = null;
 let currentName = '';
 let currentidLast4 = '';
+let maxVitalsCols = 6;
 
 async function startCamera() {
     try {
@@ -166,11 +167,10 @@ function collectFormData() {
         }
     });
 
-    // --- START: 收集生命徵象表格資料 ---
     const vitals_history = [];
     const vitalsTable = document.getElementById('vitals-table');
     const headerCells = vitalsTable.querySelectorAll('thead th');
-    const numCols = headerCells.length - 1; // 排除第一欄的標籤
+    const numCols = headerCells.length - 1;
 
     for (let i = 1; i <= numCols; i++) {
         const timeInput = headerCells[i].querySelector('input');
@@ -178,24 +178,25 @@ function collectFormData() {
         let hasData = false;
 
         vitalsTable.querySelectorAll('tbody tr').forEach(row => {
-            const input = row.cells[i].querySelector('input, select');
-            if (input) {
-                const key = input.dataset.key;
-                const value = input.value;
-                if (value) {
-                    record[key] = (input.type === 'number') ? parseInt(value) : value;
-                    hasData = true;
-                } else {
-                    record[key] = null;
+            const inputs = row.cells[i].querySelectorAll('input, select');
+            inputs.forEach(input => {
+                if (input) {
+                    const key = input.dataset.key;
+                    const value = input.value;
+                    if (value) {
+                        record[key] = (input.type === 'number') ? parseInt(value) : value;
+                        hasData = true;
+                    } else {
+                        record[key] = null;
+                    }
                 }
-            }
+            });
         });
 
         if (hasData) {
             vitals_history.push(record);
         }
     }
-    // --- END: 收集生命徵象表格資料 ---
 
     return {
         version: "1.4",
@@ -210,7 +211,7 @@ function collectFormData() {
             allergies: document.getElementById('allergies').value || "NKDA" 
         },
         injury: injuryData,
-        vitals_history: vitals_history, // 使用新的歷史紀錄
+        vitals_history: vitals_history,
         treatments: { 
             applied: treatments, 
             other: document.getElementById('otherTreatments').value 
@@ -264,7 +265,7 @@ function clearForm() {
         document.querySelectorAll('.btn-check').forEach(cb => cb.checked = false);
         document.getElementById('outputSection').style.display = 'none';
         document.getElementById('scanResult').style.display = 'none';
-        initializeVitalsTable(1); // 重置生命徵象表格
+        initializeVitalsTable(1);
     }
 }
 
@@ -359,7 +360,6 @@ function displayDecodedData(data) {
         tqHtml = '<p><strong>止血帶紀錄:</strong> 無</p>';
     }
 
-    // --- START: 顯示生命徵象表格 ---
     let vitalsHtml = '<h5>生命徵象紀錄</h5>';
     const vitalsHistory = get(data, 'vitals_history', []);
     if (vitalsHistory.length > 0) {
@@ -371,7 +371,7 @@ function displayDecodedData(data) {
                 <tr>
                     <td>${get(record, 'time')}</td>
                     <td>${get(record, 'pulse')}</td>
-                    <td>${get(record, 'blood_pressure_systolic')}/${get(record, 'blood_pressure_diastolic')}</td>
+                    <td>${get(record, 'blood_pressure_systolic', '')}/${get(record, 'blood_pressure_diastolic', '')}</td>
                     <td>${get(record, 'resp_rate')}</td>
                     <td>${get(record, 'spo2')}%</td>
                     <td>${get(record, 'avpu')}</td>
@@ -383,8 +383,6 @@ function displayDecodedData(data) {
     } else {
         vitalsHtml += '<p>無生命徵象紀錄</p>';
     }
-    // --- END: 顯示生命徵象表格 ---
-
 
     let html = `
         <div class="patient-card">
@@ -441,7 +439,6 @@ function fillFormFromData(data) {
         typeInput.dispatchEvent(new Event('input'));
     });
     
-    // --- START: 回填生命徵象表格 ---
     initializeVitalsTable(vitalsHistory.length > 0 ? vitalsHistory.length : 1);
     const headerCells = document.querySelectorAll('#vitals-table thead th');
     vitalsHistory.forEach((record, colIndex) => {
@@ -449,15 +446,16 @@ function fillFormFromData(data) {
             headerCells[colIndex + 1].querySelector('input').value = record.time || '';
         }
         document.querySelectorAll('#vitals-table tbody tr').forEach(row => {
-            const input = row.cells[colIndex + 1].querySelector('input, select');
-            if (input) {
+            const inputs = row.cells[colIndex + 1].querySelectorAll('input, select');
+            inputs.forEach(input => {
                 const key = input.dataset.key;
-                const value = record[key];
-                input.value = value === null || value === undefined ? '' : value;
-            }
+                if (record.hasOwnProperty(key)) {
+                    const value = record[key];
+                    input.value = value === null || value === undefined ? '' : value;
+                }
+            });
         });
     });
-    // --- END: 回填生命徵象表格 ---
     
     document.querySelectorAll('.btn-check').forEach(cb => {
         cb.checked = (treatments.applied || []).includes(cb.id);
@@ -476,9 +474,11 @@ function getCurrentTime() {
 }
 
 function loadSampleData() {
+    // 1. 先清空表單，確保狀態乾淨
     document.getElementById('tcccForm').reset();
     document.querySelectorAll('.btn-check').forEach(cb => cb.checked = false);
 
+    // 2. 填寫病患、傷勢等基本資料
     const sampleData = {
         patientBattleRoster: 'BR-101-001', name: '王大明', service: '陸軍',
         unit: '機步234旅', idLast4: '0001', bloodType: 'O+', allergies: 'Penicillin',
@@ -492,17 +492,20 @@ function loadSampleData() {
         }
     }
     
+    // 3. 勾選治療措施
     document.getElementById('tourniquet').checked = true;
     document.getElementById('iv').checked = true;
     document.getElementById('morphine').checked = true;
     
+    // 4. 填寫止血帶
     document.getElementById('tq_r_leg_type').value = 'CAT';
     document.getElementById('tq_r_leg_time').value = '14:30';
     document.getElementById('tq_r_leg_type').dispatchEvent(new Event('input'));
 
+    // 5. 準備並填寫生命徵象表格
     const vitalsHistory = [
-        { time: '14:35', pulse: 120, blood_pressure_systolic: '90', blood_pressure_diastolic: '60', resp_rate: 24, spo2: 92, avpu: 'Pain', pain_scale: 8 },
-        { time: '14:50', pulse: 110, blood_pressure_systolic: '95', blood_pressure_diastolic: '65', resp_rate: 22, spo2: 94, avpu: 'Pain', pain_scale: 7 }
+        { time: '14:35', pulse: 120, blood_pressure_systolic: 90, blood_pressure_diastolic: 60, resp_rate: 24, spo2: 92, avpu: 'Pain', pain_scale: 8 },
+        { time: '14:50', pulse: 110, blood_pressure_systolic: 95, blood_pressure_diastolic: 65, resp_rate: 22, spo2: 94, avpu: 'Pain', pain_scale: 7 }
     ];
 
     initializeVitalsTable(vitalsHistory.length);
@@ -525,6 +528,7 @@ function loadSampleData() {
     
     alert('✅ 範例資料已載入！');
 }
+
 
 function setupTQValidation() {
     const tqLimbs = ['r_arm', 'r_leg', 'l_arm', 'l_leg'];
@@ -551,10 +555,10 @@ function setupTQValidation() {
 // --- START: 生命徵象表格管理 ---
 const vitalsMetrics = [
     { label: '脈搏', key: 'pulse', type: 'number', placeholder: 'bpm' },
-    { label: '血壓', key: 'bloodPressure', type: 'text', placeholder: 'e.g., 120/80' },
+    { label: '血壓', key: 'bloodPressure' }, // 簡化定義
     { label: '呼吸', key: 'resp_rate', type: 'number', placeholder: 'bpm' },
     { label: '血氧', key: 'spo2', type: 'number', placeholder: '%' },
-    { label: 'AVPU', key: 'avpu', type: 'select', options: ['','Alert', 'Verbal', 'Pain', 'Unresponsive'] },
+    { label: 'AVPU', key: 'avpu', type: 'select' },
     { label: '疼痛指數', key: 'pain_scale', type: 'number', placeholder: '0-10', min:0, max:10 },
 ];
 
@@ -568,24 +572,29 @@ function initializeVitalsTable(colCount = 1) {
 
     vitalsMetrics.forEach(metric => {
         const row = tbody.insertRow();
-        row.insertCell().textContent = metric.label;
+        const labelCell = row.insertCell()
+        labelCell.textContent = metric.label;
+        if (metric.key === 'bloodPressure'){
+            labelCell.innerHTML = '血壓<br><small>(收/舒)</small>'
+        }
     });
 
     for (let i = 0; i < colCount; i++) {
-        addColumn();
+        addColumn(i === 0);
     }
 }
 
-function addColumn() {
+function addColumn(isFirst = false) {
     const table = document.getElementById('vitals-table');
     const thead = table.querySelector('thead tr');
-    if (thead.cells.length > 4) { // 包含標籤欄，總共 5 欄
-        alert('最多只能新增 4 筆時間紀錄');
+    if (thead.cells.length > maxVitalsCols) {
+        alert(`最多只能新增 ${maxVitalsCols} 筆時間紀錄`);
         return;
     }
 
     const headerCell = document.createElement('th');
-    headerCell.innerHTML = `<input type="time" class="form-control form-control-sm" value="${getCurrentTime()}">`;
+    const timeValue = isFirst ? getCurrentTime() : '';
+    headerCell.innerHTML = `<input type="time" class="form-control form-control-sm" value="${timeValue}">`;
     thead.appendChild(headerCell);
 
     table.querySelectorAll('tbody tr').forEach((row, index) => {
@@ -594,24 +603,28 @@ function addColumn() {
         if (metric.key === 'bloodPressure') {
             cell.innerHTML = `
                 <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" placeholder="收" data-key="blood_pressure_systolic">
-                    <span class="input-group-text">/</span>
-                    <input type="text" class="form-control" placeholder="舒" data-key="blood_pressure_diastolic">
+                    <input type="number" class="form-control" placeholder="收" data-key="blood_pressure_systolic">
+                    <input type="number" class="form-control" placeholder="舒" data-key="blood_pressure_diastolic">
                 </div>`;
-        } else if (metric.type === 'select') {
+        } else if (metric.key === 'avpu') {
              const select = document.createElement('select');
              select.className = 'form-select form-select-sm';
              select.dataset.key = metric.key;
-             metric.options.forEach(opt => {
+             // --- START: 優化 AVPU 選項 ---
+             const avpuOptions = {
+                '': '選擇...',
+                'Alert': 'A (清醒)',
+                'Verbal': 'V (聲音)',
+                'Pain': 'P (疼痛)',
+                'Unresponsive': 'U (無反應)'
+             };
+             for (const [value, text] of Object.entries(avpuOptions)) {
                 const option = document.createElement('option');
-                option.value = opt;
-                option.textContent = opt === 'Unresponsive' ? 'U' : (opt.charAt(0) || '');
-                if (opt === 'Alert') option.textContent = 'A (清醒)';
-                if (opt === 'Verbal') option.textContent = 'V (聲音)';
-                if (opt === 'Pain') option.textContent = 'P (疼痛)';
-                if (opt === 'Unresponsive') option.textContent = 'U (無反應)';
+                option.value = value;
+                option.textContent = text;
                 select.appendChild(option);
-             });
+             }
+             // --- END: 優化 AVPU 選項 ---
              cell.appendChild(select);
         } else {
             const input = document.createElement('input');

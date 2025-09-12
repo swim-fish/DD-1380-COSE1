@@ -44,13 +44,30 @@ textarea { min-height: 100%; resize: vertical; }
 .tq-record { display: flex; flex-direction: column; padding: 5px 0; }
 .tq-record label { font-weight: bold; color: #4a5568; }
 
-/* 生命徵象表格 */
-.vitals-label {
-    width: 100px;
-    vertical-align: middle;
+#vitals-table {
+    width: min-content; 
+    white-space: nowrap;
 }
-#vitals-table input, #vitals-table select {
-    min-width: 80px;
+
+#vitals-table th, #vitals-table td {
+    vertical-align: middle;
+    text-align: left;
+}
+
+.vitals-label {
+    width: 90px;
+}
+
+#vitals-table thead th {
+    text-align: center;
+}
+
+#vitals-table thead th:first-child {
+    text-align: left;
+}
+
+#vitals-table .input-group {
+    min-width: 130px;
 }
 
 /* 輸出結果區塊 */

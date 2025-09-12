@@ -157,10 +157,10 @@
                             id="injuryDescription" placeholder="詳細描述傷勢..."></textarea></div>
                 </div>
 
-                                <div class="form-section">
+                <div class="form-section">
                     <h3>生命徵象 Vital Signs</h3>
                     <div class="table-responsive">
-                        <table class="table table-bordered text-center" id="vitals-table">
+                        <table class="table table-bordered" id="vitals-table">
                             <thead>
                                 <tr>
                                     <th class="vitals-label">項目</th>
@@ -173,33 +173,47 @@
                         </table>
                     </div>
                     <div class="d-flex justify-content-center gap-2 mt-2">
-                        <button type="button" class="btn btn-outline-light btn-sm" id="add-vitals-col">新增時間欄</button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" id="remove-vitals-col">刪除時間欄</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                            id="add-vitals-col">新增時間欄</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm"
+                            id="remove-vitals-col">刪除時間欄</button>
                     </div>
                 </div>
 
                 <div class="form-section">
                     <h3>治療措施 Treatments</h3>
-                    <div class="btn-group flex-wrap" role="group" aria-label="Treatments toggle button group">
-                        <input type="checkbox" class="btn-check" id="tourniquet" autocomplete="off"><label
-                            class="btn btn-outline-primary" for="tourniquet">止血帶 Tourniquet</label>
-                        <input type="checkbox" class="btn-check" id="chestSeal" autocomplete="off"><label
-                            class="btn btn-outline-primary" for="chestSeal">胸封 Chest Seal</label>
-                        <input type="checkbox" class="btn-check" id="npa" autocomplete="off"><label
-                            class="btn btn-outline-primary" for="npa">鼻咽管 NPA</label>
-                        <input type="checkbox" class="btn-check" id="decompress" autocomplete="off"><label
-                            class="btn btn-outline-primary" for="decompress">胸腔減壓 Needle Decompression</label>
-                        <input type="checkbox" class="btn-check" id="iv" autocomplete="off"><label
-                            class="btn btn-outline-primary" for="iv">靜脈輸液 IV/IO</label>
-                        <input type="checkbox" class="btn-check" id="morphine" autocomplete="off"><label
-                            class="btn btn-outline-primary" for="morphine">嗎啡 Morphine</label>
-                        <input type="checkbox" class="btn-check" id="antibiotics" autocomplete="off"><label
-                            class="btn btn-outline-primary" for="antibiotics">抗生素 Antibiotics</label>
-                        <input type="checkbox" class="btn-check" id="hypothermia" autocomplete="off"><label
-                            class="btn btn-outline-primary" for="hypothermia">保溫 Hypothermia Prevention</label>
+                    <div class="container text-center">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="btn-group flex-wrap" role="group"
+                                    aria-label="Treatments toggle button group">
+                                    <input type="checkbox" class="btn-check" id="tourniquet" autocomplete="off"><label
+                                        class="btn btn-outline-primary" for="tourniquet">止血帶 Tourniquet</label>
+                                    <input type="checkbox" class="btn-check" id="chestSeal" autocomplete="off"><label
+                                        class="btn btn-outline-primary" for="chestSeal">胸封 Chest Seal</label>
+                                    <input type="checkbox" class="btn-check" id="npa" autocomplete="off"><label
+                                        class="btn btn-outline-primary" for="npa">鼻咽管 NPA</label>
+                                    <input type="checkbox" class="btn-check" id="decompress" autocomplete="off"><label
+                                        class="btn btn-outline-primary" for="decompress">胸腔減壓 Needle
+                                        Decompression</label>
+                                    <input type="checkbox" class="btn-check" id="iv" autocomplete="off"><label
+                                        class="btn btn-outline-primary" for="iv">靜脈輸液 IV/IO</label>
+                                    <input type="checkbox" class="btn-check" id="morphine" autocomplete="off"><label
+                                        class="btn btn-outline-primary" for="morphine">嗎啡 Morphine</label>
+                                    <input type="checkbox" class="btn-check" id="antibiotics" autocomplete="off"><label
+                                        class="btn btn-outline-primary" for="antibiotics">抗生素 Antibiotics</label>
+                                    <input type="checkbox" class="btn-check" id="hypothermia" autocomplete="off"><label
+                                        class="btn btn-outline-primary" for="hypothermia">保溫 Hypothermia
+                                        Prevention</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="form-group" style="margin-top: 15px;"><label>其他治療 Other
+                                        Treatments</label><textarea id="otherTreatments"
+                                        placeholder="其他治療措施..."></textarea></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group" style="margin-top: 15px;"><label>其他治療 Other Treatments</label><textarea
-                            id="otherTreatments" placeholder="其他治療措施..."></textarea></div>
                 </div>
 
                 <div class="form-section">
