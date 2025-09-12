@@ -17,10 +17,11 @@ message TcccCard {
 
 // 病患基本資訊
 message Patient {
-  string name = 1;
-  string service_number = 2;
-  BloodType blood_type = 3;
-  string allergies = 4;
+  string battle_roster = 1;
+  string name = 2;
+  string service_number = 3;
+  BloodType blood_type = 4;
+  string allergies = 5;
 }
 
 // 傷勢評估

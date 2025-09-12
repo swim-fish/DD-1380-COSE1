@@ -1,13 +1,14 @@
-// sw.js - A new implementation based on "The Offline Cookbook"
+// sw.js - Stale-While-Revalidate Implementation
 
-// 'tccc-static' 用於存放 App Shell - 那些構成應用程式核心、不常變動的檔案。
-const STATIC_CACHE_NAME = 'tccc-static-v1';
+// 更新版本號以觸發 Service Worker 的更新流程
+const STATIC_CACHE_NAME = 'tccc-static-v3';
 
-// App Shell 檔案列表
-// 這些是在 Service Worker 安裝時必須快取的核心資源。
-// 如果其中任何一個檔案快取失敗，整個安裝過程都會失敗。
+// 重要的 App Shell 檔案列表保持不變
 const URLS_TO_CACHE = [
-  'index.html', // 明確地快取主檔案
+  './', // 快取根目錄，使其能對應到 index.html
+  'index.html',
+  'style.css',
+  'app.js',
   'manifest.json',
   'icons/icon-192.png',
   'icons/icon-512.png',
@@ -21,45 +22,30 @@ const URLS_TO_CACHE = [
   'https://cdn.jsdelivr.net/npm/cbor-x@1.6.0/dist/index.min.js'
 ];
 
-/**
- * On Install: 作為依賴項快取 App Shell
- * 這是 Service Worker 生命週期的第一步。
- * 我們會快取所有核心靜態資源。
- * event.waitUntil 會確保 Service Worker 在快取操作完成前不會被安裝。
- */
+// 'install' 事件：快取 App Shell
 self.addEventListener('install', event => {
   console.log('[Service Worker] Install');
   event.waitUntil(
     (async () => {
-      // 1. 打開我們定義的靜態快取
       const cache = await caches.open(STATIC_CACHE_NAME);
-      console.log('[Service Worker] Caching all: app shell and content');
-      // 2. 將所有 App Shell 檔案加入快取
-      // cache.addAll 是一個原子操作，如果任何一個檔案下載失敗，整個操作都會失敗。
-      await cache.addAll(URLS_TO_CACHE);
+      console.log('[Service Worker] Caching all: app shell');
+      // 使用 { cache: 'reload' } 確保我們獲取的是最新的檔案，而不是瀏覽器 HTTP 快取中的舊檔
+      const requests = URLS_TO_CACHE.map(url => new Request(url, { cache: 'reload' }));
+      await cache.addAll(requests);
       console.log('[Service Worker] App shell cached successfully');
     })()
   );
 });
 
-/**
- * On Activate: 清理舊快取
- * 當新的 Service Worker 啟用時觸發。
- * 這是管理舊快取的最佳時機。
- */
+// 'activate' 事件：清理舊快取
 self.addEventListener('activate', event => {
   console.log('[Service Worker] Activate');
   event.waitUntil(
     (async () => {
-      // 1. 獲取所有現有的快取名稱
       const cacheNames = await caches.keys();
-      // 2. 遍歷所有快取，刪除不屬於當前版本的靜態快取
       await Promise.all(
         cacheNames
-          .filter(cacheName => {
-            // 篩選出以 'tccc-static-' 開頭但不是目前版本的快取
-            return cacheName.startsWith('tccc-static-') && cacheName !== STATIC_CACHE_NAME;
-          })
+          .filter(cacheName => cacheName.startsWith('tccc-static-') && cacheName !== STATIC_CACHE_NAME)
           .map(cacheName => {
             console.log(`[Service Worker] Clearing old cache: ${cacheName}`);
             return caches.delete(cacheName);
@@ -67,54 +53,61 @@ self.addEventListener('activate', event => {
       );
     })()
   );
-  // 讓 Service Worker 立即控制頁面
   return self.clients.claim();
 });
 
 /**
- * On Fetch: 提供快取或網路的回應
- * 這是實現離線優先的核心策略：Cache, falling back to network。
+ * On Fetch: 實作 Stale-While-Revalidate 策略
  */
 self.addEventListener('fetch', event => {
-  // 我們只對 GET 請求進行快取處理
+  // 只處理 GET 請求
   if (event.request.method !== 'GET') {
     return;
   }
   
+  // 對於 CDN 資源，我們依然可以使用 Cache First 策略，因為它們不常變動
+  if (event.request.url.startsWith('https://cdnjs.cloudflare.com/') || event.request.url.startsWith('https://cdn.jsdelivr.net/')) {
+    event.respondWith(
+        caches.match(event.request).then(cachedResponse => {
+            return cachedResponse || fetch(event.request);
+        })
+    );
+    return;
+  }
+
+  // 對於我們自己的 App Shell 資源 (html, css, js)，採用 Stale-While-Revalidate
   event.respondWith(
     (async () => {
-      // 1. 嘗試從快取中尋找匹配的請求
-      const cachedResponse = await caches.match(event.request);
-      if (cachedResponse) {
-        // 如果快取命中，直接回傳快取的回應
-        // console.log(`[Service Worker] Returning cached response for: ${event.request.url}`);
-        return cachedResponse;
-      }
-      
-      // 2. 如果快取中沒有，則從網路請求
-      // console.log(`[Service Worker] No cache match for: ${event.request.url}. Fetching from network.`);
-      try {
-        const networkResponse = await fetch(event.request);
-        // 如果網路請求成功，直接回傳
+      // 1. 嘗試打開快取
+      const cache = await caches.open(STATIC_CACHE_NAME);
+      // 2. 嘗試從快取中尋找匹配的回應
+      const cachedResponse = await cache.match(event.request);
+
+      // 3. 在背景發起網路請求
+      const fetchPromise = fetch(event.request).then(networkResponse => {
+        // 如果請求成功，將新的回應放入快取中
+        // 我們需要複製回應，因為 request 和 response 都是 stream，只能被使用一次
+        cache.put(event.request, networkResponse.clone());
         return networkResponse;
-      } catch (error) {
-        // 如果網路請求也失敗了（例如，使用者真的離線了），我們可以提供一個通用的離線備援頁面
-        console.error(`[Service Worker] Fetch failed for: ${event.request.url}`, error);
-        // 可以在此回傳一個預先快取的離線頁面，但目前應用中，快取優先策略已能處理大部分情況
-        // const offlineFallback = await caches.match('/offline.html');
-        // if (offlineFallback) return offlineFallback;
-        
-        // 如果連備援頁面都沒有，就讓瀏覽器處理錯誤
-        throw error;
-      }
+      }).catch(err => {
+        // 如果網路請求失敗，靜默處理錯誤，因為我們可能已經提供了快取版本
+        console.warn(`[Service Worker] Fetch failed for ${event.request.url}; returning cached response if available.`, err);
+        // 如果連快取都沒有，這裡可以回傳一個錯誤頁面，但通常 cachedResponse 會存在
+        return new Response('Network error', {
+            status: 408,
+            headers: { 'Content-Type': 'text/plain' },
+        });
+      });
+
+      // 4. 如果快取中有資料，立即回傳舊的快取版本 (Stale)
+      //    同時讓背景的網路請求 (Revalidate) 繼續進行
+      //    如果快取中沒有，則等待網路請求完成
+      return cachedResponse || await fetchPromise;
     })()
   );
 });
 
-/**
- * On Message: 處理來自頁面的指令
- * 保持這個邏輯，讓頁面可以觸發更新和查詢版本。
- */
+// 'message' 事件：處理來自頁面的指令
 self.addEventListener('message', event => {
   if (event.data && event.data.action === 'SKIP_WAITING') {
     self.skipWaiting();
