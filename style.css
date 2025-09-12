@@ -18,23 +18,14 @@ h4 { color: #4a5568; margin-top: 10px; margin-bottom: 10px; }
 
 /* 表單群組和輸入框 */
 .form-group { display: flex; flex-direction: column; }
-.form-group-justify { justify-content: space-between; }
 .form-group-wrapper { display: flex; gap: 15px; align-items: flex-start; }
 .form-group-wrapper .form-group { flex: 1; min-width: 0; }
 label { color: #718096; font-size: 14px; margin-bottom: 5px; font-weight: 600; }
-input:not(.btn-check), select, textarea {
-    padding: 10px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: all 0.3s;
-}
-input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
 textarea { min-height: 100%; resize: vertical; }
 
 /* 按鈕樣式 */
 .button-group { display: flex; gap: 15px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
-button {
+.button-group button:not(.btn) {
     padding: 12px 30px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -45,21 +36,28 @@ button {
     cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s;
 }
-button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
-button:active { transform: translateY(0); }
+.button-group button:not(.btn):hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+.button-group button:not(.btn):active { transform: translateY(0); }
 
 /* 止血帶區塊樣式 */
 .tourniquet-section { background-color: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
 .tq-record { display: flex; flex-direction: column; padding: 5px 0; }
 .tq-record label { font-weight: bold; color: #4a5568; }
-.tq-record-inputs { display: flex; gap: 10px; }
-.tq-record-inputs input[type="text"] { flex: 2; }
-.tq-record-inputs input[type="time"] { flex: 1; }
+
+/* 生命徵象表格 */
+.vitals-label {
+    width: 100px;
+    vertical-align: middle;
+}
+#vitals-table input, #vitals-table select {
+    min-width: 80px;
+}
 
 /* 輸出結果區塊 */
 .output-section { margin-top: 30px; padding: 20px; background: #f7fafc; border-radius: 10px; }
 .data-display { background: #2d3748; color: #68d391; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 12px; word-break: break-all; margin: 10px 0; }
 .stats { margin-top: 20px; }
+.stat-value { font-size: 1.5rem; font-weight: bold; color: #667eea; }
 
 #qrcode {
     display: flex;

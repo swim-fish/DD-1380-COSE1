@@ -157,31 +157,24 @@
                             id="injuryDescription" placeholder="詳細描述傷勢..."></textarea></div>
                 </div>
 
-                <div class="form-section">
+                                <div class="form-section">
                     <h3>生命徵象 Vital Signs</h3>
-                    <div class="form-grid">
-                        <div class="form-group"><label>脈搏 Pulse (bpm)</label><input type="number" id="pulse" min="0"
-                                max="300"></div>
-                        <div class="form-group"><label>血壓 Blood Pressure (mmHg)</label>
-                            <div class="input-group"><input type="text" class="form-control" placeholder="Systolic 120"
-                                    aria-label="Systolic (mmHg)" id="bloodPressureSystolic"><span
-                                    class="input-group-text">/</span><input type="text" class="form-control"
-                                    placeholder="Diastolic 80" aria-label="Diastolic (mmHg)"
-                                    id="bloodPressureDiastolic"></div>
-                        </div>
-                        <div class="form-group"><label>呼吸 Respiratory Rate (bpm)</label><input type="number"
-                                id="respRate" min="0" max="60"></div>
-                        <div class="form-group"><label>血氧 SpO2 (%)</label><input type="number" id="spo2" min="0"
-                                max="100"></div>
-                        <div class="form-group"><label for="avpu">AVPU</label><select id="avpu" class="form-select">
-                                <option value="">選擇意識水平</option>
-                                <option value="Alert">Alert (清醒)</option>
-                                <option value="Verbal">Verbal (聲音刺激)</option>
-                                <option value="Pain">Pain (疼痛刺激)</option>
-                                <option value="Unresponsive">Unresponsive (無反應)</option>
-                            </select></div>
-                        <div class="form-group"><label for="painScale">Pain Scale (0-10)</label><input type="number"
-                                id="painScale" class="form-control" min="0" max="10" placeholder="0-10"></div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center" id="vitals-table">
+                            <thead>
+                                <tr>
+                                    <th class="vitals-label">項目</th>
+                                    <!-- 時間欄位將由 JS 動態生成 -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 資料列將由 JS 動態生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-center gap-2 mt-2">
+                        <button type="button" class="btn btn-outline-light btn-sm" id="add-vitals-col">新增時間欄</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" id="remove-vitals-col">刪除時間欄</button>
                     </div>
                 </div>
 

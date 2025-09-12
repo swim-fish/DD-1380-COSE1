@@ -3,21 +3,36 @@ syntax = "proto3";
 package tccc;
 import "google/protobuf/timestamp.proto";
 
+// 單次止血帶應用紀錄
 message Tourniquet {
   string type = 1;
   string time = 2;
 }
 
+// 單次生命徵象測量紀錄
+message VitalSignRecord {
+  string time = 1; // 測量時間 (HH:mm)
+  optional int32 pulse = 2;
+  optional int32 blood_pressure_systolic = 3;
+  optional int32 blood_pressure_diastolic = 4;
+  optional int32 resp_rate = 5;
+  optional int32 spo2 = 6;
+  optional AvpuLevel avpu = 7;
+  optional int32 pain_scale = 8;
+}
+
+// 主 TCCC 卡片訊息
 message TcccCard {
   string version = 1;
   google.protobuf.Timestamp timestamp = 2;
   Patient patient = 3;
   Injury injury = 4;
-  VitalSigns vitals = 5;
+  repeated VitalSignRecord vitals_history = 5;
   Treatments treatments = 6;
   Evacuation evacuation = 7;
 }
 
+// 病患資訊
 message Patient {
   string battle_roster = 1;
   string name = 2;
@@ -28,6 +43,7 @@ message Patient {
   string unit = 7;
 }
 
+// 傷勢資訊
 message Injury {
   google.protobuf.Timestamp time = 1;
   Mechanism mechanism = 2;
@@ -38,27 +54,19 @@ message Injury {
   optional Tourniquet tq_l_leg = 7;
 }
 
-message VitalSigns {
-  optional int32 pulse = 1;
-  optional string blood_pressure_systolic = 2;
-  optional string blood_pressure_diastolic = 3;
-  optional int32 resp_rate = 4;
-  optional int32 spo2 = 5;
-  optional AvpuLevel avpu = 6;
-  optional int32 pain_scale = 7;
-}
-
-
+// 治療措施
 message Treatments {
   repeated string applied = 1;
   string other = 2;
 }
 
+// 後送資訊
 message Evacuation {
   EvacPriority priority = 1;
   string medic_name = 2;
 }
 
+// --- 枚舉類型 ---
 enum BloodType {
   BLOOD_TYPE_UNSPECIFIED = 0;
   A_POS = 1; A_NEG = 2; B_POS = 3; B_NEG = 4;
