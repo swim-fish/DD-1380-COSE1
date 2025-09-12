@@ -59,10 +59,6 @@ async function handleFileSelect(event) {
 // --- END: QR Code 掃描相關函式 ---
 
 // --- START: Web Crypto and COSE Sign1 ---
-function str2ab(str) {
-    return new TextEncoder().encode(str);
-}
-
 async function getOrGenerateKeys() {
     const storedKeys = JSON.parse(sessionStorage.getItem('tcccKeys'));
     if (storedKeys) {
@@ -146,9 +142,22 @@ function base45Decode(str) {
 
 
 function collectFormData() {
-    const treatments = Array.from(document.querySelectorAll('input[name="treatment"]:checked')).map(cb => cb.id);
+    // --- START: 更新治療措施的收集方式 ---
+    // 逐一檢查每個治療措施的 ID
+    const treatments = [];
+    const treatmentIds = [
+        'tourniquet', 'chestSeal', 'npa', 'decompress', 
+        'iv', 'morphine', 'antibiotics', 'hypothermia'
+    ];
     
-    // 收集止血帶資料
+    treatmentIds.forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox && checkbox.checked) {
+            treatments.push(id);
+        }
+    });
+    // --- END: 更新治療措施的收集方式 ---
+    
     const injuryData = {
         time: document.getElementById('injuryTime').value,
         mechanism: document.getElementById('mechanism').value,
@@ -179,8 +188,8 @@ function collectFormData() {
         injury: injuryData,
         vitals: { 
             pulse: parseInt(document.getElementById('pulse').value) || null, 
-            bloodPressureSystolic: document.getElementById('bloodPressureSystolic').value || null, 
-            bloodPressureDiastolic: document.getElementById('bloodPressureDiastolic').value || null, 
+            bloodPressureSystolic: document.getElementById('bloodPressureSystolic').value || null,
+            bloodPressureDiastolic: document.getElementById('bloodPressureDiastolic').value || null,
             respRate: parseInt(document.getElementById('respRate').value) || null, 
             spo2: parseInt(document.getElementById('spo2').value) || null 
         },
@@ -234,6 +243,7 @@ document.getElementById('tcccForm').addEventListener('submit', async function(e)
 function clearForm() {
     if (confirm('確定要清除所有資料嗎？')) {
         document.getElementById('tcccForm').reset();
+        document.querySelectorAll('.btn-check').forEach(cb => cb.checked = false);
         document.getElementById('outputSection').style.display = 'none';
         document.getElementById('scanResult').style.display = 'none';
     }
@@ -436,7 +446,7 @@ function loadSampleData() {
     document.getElementById('tq_r_leg_type').value = 'CAT';
     document.getElementById('tq_r_leg_time').value = '14:30';
     document.getElementById('tq_r_leg_type').dispatchEvent(new Event('input'));
-    alert('✅ 範例資料已載入！您可以直接生成 QR Code 測試。');
+    alert('✅ 範例資料已載入！');
 }
 
 function setupTQValidation() {
@@ -512,7 +522,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Make checkForUpdate globally accessible
     window.checkForUpdate = checkForUpdate;
 
     if ('serviceWorker' in navigator) {
@@ -563,5 +572,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    setupTQValidation(); // 啟用止血帶驗證
+    setupTQValidation();
 });
+
