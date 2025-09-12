@@ -1,7 +1,7 @@
 // sw.js - Stale-While-Revalidate Implementation
 
 // 更新版本號以觸發 Service Worker 的更新流程
-const STATIC_CACHE_NAME = 'tccc-static-v2';
+const STATIC_CACHE_NAME = 'tccc-static-v3';
 
 // 重要的 App Shell 檔案列表保持不變
 const URLS_TO_CACHE = [
