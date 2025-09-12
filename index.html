@@ -18,7 +18,7 @@
 
     <!-- 外部函式庫 (保持不變) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/3.45.1/minified.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cbor-x@1.6.0/dist/index.min.js"></script>
@@ -285,6 +285,19 @@
             <div id="decodedData"></div>
         </div>
     </div>
+
+    <footer class="container text-center py-4 mt-4">
+        <a href="https://github.com/swim-fish/DD-1380-COSE1" target="_blank" rel="noopener noreferrer"
+            class="text-white-50">專案 GitHub 連結</a>
+    </footer>
+    <a href="#" id="back-to-top" class="btn btn-primary rounded-circle shadow" title="回到最上面">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up"
+            viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+                d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z" />
+        </svg>
+    </a>
+
     <div id="update-notification"
         style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #2d3748; color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000; align-items: center;">
         <span style="margin-right: 20px;">有新版本可用！</span><button id="update-button"

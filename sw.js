@@ -1,6 +1,6 @@
 // sw.js - Stale-While-Revalidate Implementation
 
-const STATIC_CACHE_NAME = 'tccc-static-v7';
+const STATIC_CACHE_NAME = 'tccc-static-v8';
 
 const URLS_TO_CACHE = [
   './', 
@@ -13,7 +13,7 @@ const URLS_TO_CACHE = [
   'icons/favicon.ico',
   'icons/apple-touch-icon.png',
   'https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/core-js/3.45.1/minified.min.js',
   'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js',
   'https://cdn.jsdelivr.net/npm/cbor-x@1.6.0/dist/index.min.js',

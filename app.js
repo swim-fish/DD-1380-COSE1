@@ -251,10 +251,22 @@ document.getElementById('tcccForm').addEventListener('submit', async function(e)
     currentidLast4 = tcccData.patient.idLast4;
 
     document.getElementById('qrcode').innerHTML = '';
-    new QRCode(document.getElementById('qrcode'), {
-        text: qrData, width: 300, height: 300,
-        colorDark: "#000000", colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.M
+
+    const opts = {
+        errorCorrectionLevel: 'M',
+        type: 'image/jpeg',
+        quality: 1,
+        margin: 4,
+        color: {
+            dark:"#000000ff",
+            light:"#ffffffff"
+        }
+    };
+    QRCode.toCanvas(qrData, opts, function (error, canvas) {
+        if (error) throw error;
+        
+        var container = document.getElementById('qrcode');
+        container.appendChild(canvas);
     });
     document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
 });
@@ -758,5 +770,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setupTQValidation();
+
+    const backToTopButton = document.getElementById("back-to-top");
+    window.addEventListener("scroll", () => {
+        if (window.pageYOffset > 300) { // 滾動超過 300px 時顯示
+            backToTopButton.style.display = "flex";
+            
+        } else {
+            backToTopButton.style.display = "none";
+        }
+    });
+    backToTopButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
 });
 
