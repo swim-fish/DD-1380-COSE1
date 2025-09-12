@@ -22,6 +22,8 @@ message Patient {
   string service_number = 3;
   BloodType blood_type = 4;
   string allergies = 5;
+  string service = 6; // 軍種
+  string unit = 7;    // 單位
 }
 
 // 傷勢評估
@@ -35,8 +37,6 @@ message Injury {
 
 // 生命徵象
 message VitalSigns {
-  // 使用 sint32 來表示可能有負值的整數，或在此情境下代表可選的數值
-  // 欄位編號可以不連續
   optional int32 pulse = 1;
   optional string blood_pressure = 2;
   optional int32 resp_rate = 3;
@@ -56,7 +56,6 @@ message Evacuation {
 }
 
 // --- 以下是枚舉 (Enum) 類型定義 ---
-// 為了更佳的型別安全和資料壓縮，我們將下拉選單和 checkbox 的選項定義為枚舉
 
 enum BloodType {
   BLOOD_TYPE_UNSPECIFIED = 0;
@@ -70,15 +69,21 @@ enum BloodType {
   O_NEG = 8;
 }
 
+// START: 更新受傷機制枚舉
 enum Mechanism {
   MECHANISM_UNSPECIFIED = 0;
-  GSW = 1;    // 槍傷
-  IED = 2;    // 爆炸
-  RPG = 3;    // 火箭彈
-  MVC = 4;    // 車禍
-  FALL = 5;   // 墜落
-  OTHER = 6;  // 其他
+  ARTILLERY = 1;      // 砲擊
+  BURN = 2;           // 燒燙傷
+  FALL = 3;           // 墜落
+  GRENADE = 4;        // 手榴彈
+  GSW = 5;            // 槍傷
+  IED = 6;            // 爆炸裝置
+  LANDMINE = 7;       // 地雷
+  MVC = 8;            // 車禍
+  RPG = 9;            // 火箭彈
+  OTHER = 10;         // 其他
 }
+// END: 更新受傷機制枚舉
 
 enum InjuryLocation {
   INJURY_LOCATION_UNSPECIFIED = 0;
@@ -94,23 +99,22 @@ enum InjuryLocation {
 
 enum TreatmentType {
   TREATMENT_TYPE_UNSPECIFIED = 0;
-  TOURNIQUET = 1;      // 止血帶
-  CHEST_SEAL = 2;      // 胸封
-  NPA = 3;             // 鼻咽管
-  NEEDLE_DECOMPRESSION = 4; // 胸腔減壓
-  IV_IO = 5;           // 靜脈輸液
-  MORPHINE = 6;        // 嗎啡
-  ANTIBIOTICS = 7;     // 抗生素
-  HYPOTHERMIA_PREVENTION = 8; // 保溫
+  TOURNIQUET = 1;
+  CHEST_SEAL = 2;
+  NPA = 3;
+  NEEDLE_DECOMPRESSION = 4;
+  IV_IO = 5;
+  MORPHINE = 6;
+  ANTIBIOTICS = 7;
+  HYPOTHERMIA_PREVENTION = 8;
 }
 
 enum EvacPriority {
   EVAC_PRIORITY_UNSPECIFIED = 0;
-  URGENT = 1;    // 緊急
-  PRIORITY = 2;  // 優先
-  ROUTINE = 3;   // 例行
+  URGENT = 1;
+  PRIORITY = 2;
+  ROUTINE = 3;
 }
 
-// 為了使用 google.protobuf.Timestamp，需要在編譯時引入 google/protobuf/timestamp.proto
-// 在 JavaScript 中，通常由函式庫處理
+// 為了使用 google.protobuf.Timestamp，需要在編譯時引入
 // import "google/protobuf/timestamp.proto";

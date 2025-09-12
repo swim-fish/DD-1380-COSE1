@@ -9,7 +9,9 @@
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
-    <!-- 引入外部 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    
+    <!-- 引入自訂外部 CSS (在 Bootstrap 之後) -->
     <link rel="stylesheet" href="style.css">
 
     <!-- 外部函式庫 (保持不變) -->
@@ -54,13 +56,14 @@
                     <h3>基本資訊 Basic Information</h3>
                     <div class="form-grid">
                         <div class="form-group form-group-justify">
-                            <label for="patientBattleRoster">戰傷編號 Battle Roster:</label>
+                            <label for="patientBattleRoster">戰傷編號 (Battle Roster):</label>
                             <input type="text" id="patientBattleRoster" name="patientBattleRoster" placeholder="輸入戰場傷患編號" required>
                         </div>
                         <div class="form-group form-group-justify">
                             <label>姓名 Name</label>
                             <input type="text" id="name" required>
-                        </div> 
+                        </div>
+                        
                         <div class="form-group-wrapper">
                             <div class="form-group form-group-justify">
                                 <label>ID 末4碼  Last 4</label>
@@ -70,14 +73,10 @@
                                 <label>血型 Blood Type</label>
                                 <select id="bloodType" required>
                                     <option value="">選擇血型</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
+                                    <option value="A+">A+</option> <option value="A-">A-</option>
+                                    <option value="B+">B+</option> <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option> <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option> <option value="O-">O-</option>
                                 </select>
                             </div>
                         </div>
@@ -93,6 +92,7 @@
                                 <input type="text" id="unit" placeholder="例如：步兵101旅">
                             </div>
                         </div>
+                        
                         <div class="form-group form-group-justify">
                             <label>過敏史 Allergies</label>
                             <input type="text" id="allergies" placeholder="無過敏請填 NKDA">
@@ -100,7 +100,6 @@
                     </div>
                 </div>
 
-                <!-- 其他表單區塊保持不變 -->
                 <div class="form-section">
                     <h3>傷勢評估 Injury Assessment</h3>
                     <div class="form-grid">
@@ -111,147 +110,138 @@
                         <div class="form-group">
                             <label>受傷機制 Mechanism of Injury</label>
                             <select id="mechanism" required>
-                                <option value="">選擇</option>
-                                <option value="GSW">槍傷 GSW</option>
-                                <option value="IED">爆炸 IED</option>
-                                <option value="RPG">火箭彈 RPG</option>
-                                <option value="MVC">車禍 MVC</option>
-                                <option value="Fall">墜落 Fall</option>
-                                <option value="Other">其他 Other</option>
+                                <option value="">選擇機制</option>
+                                <option value="Artillery">砲擊 Artillery</option> <option value="Burn">燒燙傷 Burn</option>
+                                <option value="Fall">墜落 Fall</option> <option value="Grenade">手榴彈 Grenade</option>
+                                <option value="GSW">槍傷 GSW</option> <option value="IED">爆炸裝置 IED</option>
+                                <option value="Landmine">地雷 Landmine</option> <option value="MVC">車輛事故 MVC</option>
+                                <option value="RPG">火箭彈 RPG</option> <option value="Other">其他 Other</option>
                             </select>
                         </div>
                     </div>
                     
-                    <div class="injury-section">
-                        <div class="form-group">
-                            <label>傷勢部位 Injury Location</label>
-                            <div class="body-diagram">
-                                <p style="color: #718096;">身體部位示意圖</p>
-                                <div class="treatment-checklist">
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="head" name="injury">
-                                        <label for="head">頭部 Head</label>
+                    <!-- START: 新增止血帶紀錄區塊 -->
+                    <div class="form-section" style="margin-top: 20px;">
+                        <h4>止血帶紀錄 (Tourniquet Application)</h4>
+                        <div class="tourniquet-section">
+                            <div class="container text-center">
+                                <div class="row">
+                                    <div class="col">
+                                        <!-- TQ Left Arm -->
+                                        <div class="tq-record">
+                                            <label for="tq_l_arm_type">TQ: Left Arm</label>
+                                            <div class="tq-record-inputs">
+                                                <input type="text" id="tq_l_arm_type" list="tq-types" placeholder="Type">
+                                                <input type="time" id="tq_l_arm_time">
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="neck" name="injury">
-                                        <label for="neck">頸部 Neck</label>
+                                    <div class="col">
+                                        <!-- TQ Right Arm -->
+                                        <div class="tq-record">
+                                            <label for="tq_r_arm_type">TQ: Right Arm</label>
+                                            <div class="tq-record-inputs">
+                                                <input type="text" id="tq_r_arm_type" list="tq-types" placeholder="Type">
+                                                <input type="time" id="tq_r_arm_time">
+                                            </div>
+                                        </div>
+                                        
                                     </div>
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="chest" name="injury">
-                                        <label for="chest">胸部 Chest</label>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <!-- TQ Left Leg -->
+                                        <div class="tq-record">
+                                            <label for="tq_l_leg_type">TQ: Left Leg</label>
+                                            <div class="tq-record-inputs">
+                                                <input type="text" id="tq_l_leg_type" list="tq-types" placeholder="Type">
+                                                <input type="time" id="tq_l_leg_time">
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="abdomen" name="injury">
-                                        <label for="abdomen">腹部 Abdomen</label>
-                                    </div>
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="leftArm" name="injury">
-                                        <label for="leftArm">左臂 L-Arm</label>
-                                    </div>
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="rightArm" name="injury">
-                                        <label for="rightArm">右臂 R-Arm</label>
-                                    </div>
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="leftLeg" name="injury">
-                                        <label for="leftLeg">左腿 L-Leg</label>
-                                    </div>
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="rightLeg" name="injury">
-                                        <label for="rightLeg">右腿 R-Leg</label>
+                                    <div class="col">
+                                        <!-- TQ Right Leg -->
+                                        <div class="tq-record">
+                                            <label for="tq_r_leg_type">TQ: Right Leg</label>
+                                            <div class="tq-record-inputs">
+                                                <input type="text" id="tq_r_leg_type" list="tq-types" placeholder="Type">
+                                                <input type="time" id="tq_r_leg_time">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label>傷勢描述 Injury Description</label>
-                            <textarea id="injuryDescription" placeholder="詳細描述傷勢..."></textarea>
-                        </div>
+                        <datalist id="tq-types">
+                            <option value="CAT"></option>
+                            <option value="SAM"></option>
+                        </datalist>
+                    </div>
+                    <!-- END: 新增止血帶紀錄區塊 -->
+
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label>傷勢描述 Injury Description</label>
+                        <textarea id="injuryDescription" placeholder="詳細描述傷勢..."></textarea>
                     </div>
                 </div>
 
+                <!-- 其他表單區塊... -->
                 <div class="form-section">
                     <h3>生命徵象 Vital Signs</h3>
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label>脈搏 Pulse (bpm)</label>
-                            <input type="number" id="pulse" min="0" max="300">
-                        </div>
+                        <div class="form-group"><label>脈搏 Pulse (bpm)</label><input type="number" id="pulse" min="0" max="300"></div>
+                        
+                        
+                        <!-- <div class="form-group"><label>血壓 Blood Pressure (mmHg)</label><input type="text" id="bloodPressure" placeholder="120/80"></div> -->
                         <div class="form-group">
                             <label>血壓 Blood Pressure (mmHg)</label>
-                            <input type="text" id="bloodPressure" placeholder="120/80">
+                            
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" placeholder="Systolic 120" aria-label="Systolic (mmHg)" id="bloodPressureSystolic">
+                                <span class="input-group-text">/</span>
+                                <input type="text" class="form-control" placeholder="Diastolic 80" aria-label="Diastolic (mmHg)" id="bloodPressureDiastolic">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>呼吸 Respiratory Rate (bpm)</label>
-                            <input type="number" id="respRate" min="0" max="60">
-                        </div>
-                        <div class="form-group">
-                            <label>血氧 SpO2 (%)</label>
-                            <input type="number" id="spo2" min="0" max="100">
-                        </div>
+                        <div class="form-group"><label>呼吸 Respiratory Rate (bpm)</label><input type="number" id="respRate" min="0" max="60"></div>
+                        <div class="form-group"><label>血氧 SpO2 (%)</label><input type="number" id="spo2" min="0" max="100"></div>
                     </div>
                 </div>
 
                 <div class="form-section">
                     <h3>治療措施 Treatments</h3>
-                    <div class="treatment-checklist">
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="tourniquet" name="treatment">
-                            <label for="tourniquet">止血帶 Tourniquet</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="chestSeal" name="treatment">
-                            <label for="chestSeal">胸封 Chest Seal</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="npa" name="treatment">
-                            <label for="npa">鼻咽管 NPA</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="decompress" name="treatment">
-                            <label for="decompress">胸腔減壓 Needle Decompression</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="iv" name="treatment">
-                            <label for="iv">靜脈輸液 IV/IO</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="morphine" name="treatment">
-                            <label for="morphine">嗎啡 Morphine</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="antibiotics" name="treatment">
-                            <label for="antibiotics">抗生素 Antibiotics</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="hypothermia" name="treatment">
-                            <label for="hypothermia">保溫 Hypothermia Prevention</label>
-                        </div>
+                    <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+                        <input type="checkbox" class="btn-check" name="btnradio" id="tourniquet" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="tourniquet">止血帶 Tourniquet</label>
+                        
+                        <input type="checkbox" class="btn-check" name="btnradio" id="chestSeal" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="chestSeal">胸封 Chest Seal</label>
+
+                        <input type="checkbox" class="btn-check" name="btnradio" id="npa" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="npa">鼻咽管 NPA</label>
+                        
+                        <input type="checkbox" class="btn-check" name="btnradio" id="decompress" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="decompress">胸腔減壓 Needle Decompression</label>
+                        
+                        <input type="checkbox" class="btn-check" name="btnradio" id="iv" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="iv">靜脈輸液 IV/IO</label>
+
+                        <input type="checkbox" class="btn-check" name="btnradio" id="morphine" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="morphine">嗎啡 Morphine</label>
+                        
+                        <input type="checkbox" class="btn-check" name="btnradio" id="antibiotics" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="antibiotics">抗生素 Antibiotics</label>
+
+                        <input type="checkbox" class="btn-check" name="btnradio" id="hypothermia" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="hypothermia">保溫 Hypothermia Prevention</label>
                     </div>
-                    
-                    <div class="form-group" style="margin-top: 15px;">
-                        <label>其他治療 Other Treatments</label>
-                        <textarea id="otherTreatments" placeholder="其他治療措施..."></textarea>
-                    </div>
+                    <div class="form-group" style="margin-top: 15px;"><label>其他治療 Other Treatments</label><textarea id="otherTreatments" placeholder="其他治療措施..."></textarea></div>
                 </div>
 
                 <div class="form-section">
                     <h3>後送資訊 Evacuation Info</h3>
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label>後送優先級 Evacuation Priority</label>
-                            <select id="evacPriority" required>
-                                <option value="">選擇</option>
-                                <option value="Urgent">緊急 Urgent</option>
-                                <option value="Priority">優先 Priority</option>
-                                <option value="Routine">例行 Routine</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>救護員 Medic Name</label>
-                            <input type="text" id="medicName" required>
-                        </div>
+                        <div class="form-group"><label>後送優先級 Evacuation Priority</label><select id="evacPriority" required><option value="">選擇</option><option value="Urgent">緊急 Urgent</option><option value="Priority">優先 Priority</option><option value="Routine">例行 Routine</option></select></div>
+                        <div class="form-group"><label>救護員 Medic Name</label><input type="text" id="medicName" required></div>
                     </div>
                 </div>
 
@@ -263,21 +253,28 @@
         </div>
 
         <div class="card output-section" id="outputSection" style="display: none;">
-             <h3>📊 處理結果</h3>
-            
+            <h3>📊 處理結果</h3>
             <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-value" id="originalSize">0</div>
-                    <div class="stat-label">原始大小 (bytes)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="compressedSize">0</div>
-                    <div class="stat-label">壓縮後大小 (bytes)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="compressionRatio">0%</div>
-                    <div class="stat-label">壓縮率</div>
-                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                        <th scope="col"></th>
+                        <th scope="col">原始大小 (bytes)</th>
+                        <th scope="col">壓縮後大小 (bytes)</th>
+                        <th scope="col">最終 QR Code 大小 (bytes)</th>
+                        <th scope="col">壓縮率</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        <tr>
+                        <th scope="row"></th>
+                        <td><div class="stat-value" id="originalSize">0</div></td>
+                        <td><div class="stat-value" id="compressedSize">0</div></td>
+                        <td><div class="stat-value" id="qrDataSize">0</div></td>
+                        <td><div class="stat-value" id="compressionRatio">0%</div></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
             <h4 style="margin-top: 20px;">結構化資料 (JSON)</h4>
@@ -290,7 +287,7 @@
             <div class="data-display" id="base45Data"></div>
             
             <h4>QR Code</h4>
-            <div id="qrcode"></div>
+            <div id="qrcode" class="text-center"></div>
             
             <div class="button-group">
                 <button onclick="downloadQRCode()">下載 QR Code</button>
@@ -312,8 +309,13 @@
         Loading version...
     </div>
 
+    <!-- START: 新增 Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <!-- END: 新增 Bootstrap JS -->
+
     <!-- 引入外部 JavaScript -->
     <script src="app.js"></script>
 
 </body>
 </html>
+

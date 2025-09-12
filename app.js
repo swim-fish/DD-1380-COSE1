@@ -144,12 +144,28 @@ function base45Decode(str) {
     return new Uint8Array(result);
 }
 
-// [UPDATED] - collectFormData
+
 function collectFormData() {
-    const injuries = Array.from(document.querySelectorAll('input[name="injury"]:checked')).map(cb => cb.id);
     const treatments = Array.from(document.querySelectorAll('input[name="treatment"]:checked')).map(cb => cb.id);
+    
+    // 收集止血帶資料
+    const injuryData = {
+        time: document.getElementById('injuryTime').value,
+        mechanism: document.getElementById('mechanism').value,
+        description: document.getElementById('injuryDescription').value
+    };
+
+    const tqLimbs = ['r_arm', 'r_leg', 'l_arm', 'l_leg'];
+    tqLimbs.forEach(limb => {
+        const type = document.getElementById(`tq_${limb}_type`).value.trim();
+        const time = document.getElementById(`tq_${limb}_time`).value;
+        if (type && time) {
+            injuryData[`tq_${limb}`] = { type, time };
+        }
+    });
+
     return {
-        version: "1.0",
+        version: "1.2",
         timestamp: new Date().toISOString(),
         patient: { 
             battleRoster: document.getElementById('patientBattleRoster').value,
@@ -160,15 +176,11 @@ function collectFormData() {
             bloodType: document.getElementById('bloodType').value, 
             allergies: document.getElementById('allergies').value || "NKDA" 
         },
-        injury: { 
-            time: document.getElementById('injuryTime').value, 
-            mechanism: document.getElementById('mechanism').value, 
-            locations: injuries, 
-            description: document.getElementById('injuryDescription').value 
-        },
+        injury: injuryData,
         vitals: { 
             pulse: parseInt(document.getElementById('pulse').value) || null, 
-            bloodPressure: document.getElementById('bloodPressure').value || null, 
+            bloodPressureSystolic: document.getElementById('bloodPressureSystolic').value || null, 
+            bloodPressureDiastolic: document.getElementById('bloodPressureDiastolic').value || null, 
             respRate: parseInt(document.getElementById('respRate').value) || null, 
             spo2: parseInt(document.getElementById('spo2').value) || null 
         },
@@ -196,14 +208,16 @@ document.getElementById('tcccForm').addEventListener('submit', async function(e)
     
     const base45Encoded = base45Encode(compressed);
     const qrData = "TC1:" + base45Encoded;
+    const qrDataSize = base45Encoded.length;
     
     document.getElementById('outputSection').style.display = 'block';
-    document.getElementById('jsonData').textContent = jsonString;
-    document.getElementById('signedData').textContent = `[Binary COSE_Sign1 Data - ${coseSign1Bytes.byteLength} bytes]`;
-    document.getElementById('base45Data').textContent = qrData;
+    document.getElementById('jsonData').innerHTML  = `<pre class="overflow-auto" style="max-height: 200px;"><code>${jsonString}</code></pre>`;
+    document.getElementById('signedData').innerHTML  = `[Binary COSE_Sign1 Data - ${coseSign1Bytes.byteLength} bytes]`;
+    document.getElementById('base45Data').innerHTML  = `<pre class="overflow-auto" style="max-height: 200px;"><code>${qrData}</code></pre>`;
     document.getElementById('originalSize').textContent = originalSize;
     document.getElementById('compressedSize').textContent = compressedSize;
     document.getElementById('compressionRatio').textContent = Math.round((1 - compressedSize / originalSize) * 100) + '%';
+    document.getElementById('qrDataSize').textContent = qrDataSize;
     
     currentName = tcccData.patient.name;
     currentidLast4 = tcccData.patient.idLast4;
@@ -288,16 +302,34 @@ async function processQRCode(qrData) {
 
 // --- Display and Form Fill Logic ---
 
-// [UPDATED] - displayDecodedData
 function displayDecodedData(data) {
     const scanResult = document.getElementById('scanResult');
     const decodedData = document.getElementById('decodedData');
     
-    // Helper for safe data access
     const get = (obj, path, defaultValue = 'N/A') => {
         const value = path.split('.').reduce((acc, part) => acc && acc[part], obj);
-        return value !== undefined && value !== null ? value : defaultValue;
+        return value !== undefined && value !== null && value !== '' ? value : defaultValue;
     };
+
+    let tqHtml = '';
+    const tqData = [
+        { label: 'R Arm', data: get(data, 'injury.tq_r_arm', null) },
+        { label: 'R Leg', data: get(data, 'injury.tq_r_leg', null) },
+        { label: 'L Arm', data: get(data, 'injury.tq_l_arm', null) },
+        { label: 'L Leg', data: get(data, 'injury.tq_l_leg', null) },
+    ];
+
+    const appliedTqs = tqData.filter(tq => tq.data !== null);
+
+    if (appliedTqs.length > 0) {
+        tqHtml += '<p><strong>止血帶紀錄:</strong></p><ul>';
+        appliedTqs.forEach(tq => {
+            tqHtml += `<li>${tq.label}: ${get(tq.data, 'type')} at ${get(tq.data, 'time')}</li>`;
+        });
+        tqHtml += '</ul>';
+    } else {
+        tqHtml = '<p><strong>止血帶紀錄:</strong> 無</p>';
+    }
 
     let html = `
         <div class="patient-card">
@@ -314,7 +346,7 @@ function displayDecodedData(data) {
             <hr style="margin: 10px 0;">
             <p><strong>受傷時間:</strong> ${new Date(get(data, 'injury.time', new Date())).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</p>
             <p><strong>受傷機制:</strong> ${get(data, 'injury.mechanism')}</p>
-            <p><strong>受傷部位:</strong> ${get(data, 'injury.locations', []).join(', ') || '無'}</p>
+            ${tqHtml}
             <p><strong>已實施治療:</strong> ${get(data, 'treatments.applied', []).join(', ') || '無'}</p>
             <hr style="margin: 10px 0;">
             <p><strong>救護員:</strong> ${get(data, 'evacuation.medicName')} | <strong>記錄時間:</strong> ${new Date(get(data, 'timestamp', new Date())).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</p>
@@ -324,7 +356,6 @@ function displayDecodedData(data) {
     scanResult.scrollIntoView({ behavior: 'smooth' });
 }
 
-// [UPDATED] - fillFormFromData
 function fillFormFromData(data) {
     const patient = data.patient || {};
     const injury = data.injury || {};
@@ -339,6 +370,23 @@ function fillFormFromData(data) {
     document.getElementById('idLast4').value = patient.idLast4 || '';
     document.getElementById('bloodType').value = patient.bloodType || '';
     document.getElementById('allergies').value = patient.allergies || '';
+
+     // 填寫止血帶資料
+    const tqLimbs = ['r_arm', 'r_leg', 'l_arm', 'l_leg'];
+    tqLimbs.forEach(limb => {
+        const tqData = injury[`tq_${limb}`];
+        const typeInput = document.getElementById(`tq_${limb}_type`);
+        const timeInput = document.getElementById(`tq_${limb}_time`);
+        if (tqData) {
+            typeInput.value = tqData.type || '';
+            timeInput.value = tqData.time || '';
+        } else {
+            typeInput.value = '';
+            timeInput.value = '';
+        }
+        // 觸發一次驗證
+        typeInput.dispatchEvent(new Event('input'));
+    });
     
     document.getElementById('injuryTime').value = injury.time || '';
     document.getElementById('mechanism').value = injury.mechanism || '';
@@ -350,7 +398,8 @@ function fillFormFromData(data) {
     });
     
     document.getElementById('pulse').value = vitals.pulse || '';
-    document.getElementById('bloodPressure').value = vitals.bloodPressure || '';
+    document.getElementById('bloodPressureSystolic').value = vitals.bloodPressureSystolic || '';
+    document.getElementById('bloodPressureDiastolic').value = vitals.bloodPressureDiastolic || '';
     document.getElementById('respRate').value = vitals.respRate || '';
     document.getElementById('spo2').value = vitals.spo2 || '';
     
@@ -369,7 +418,6 @@ function getCurrentDate() {
     return new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 }
 
-// [UPDATED] - loadSampleData
 function loadSampleData() {
     const sampleData = {
         patientBattleRoster: 'BR-101-001',
@@ -383,7 +431,8 @@ function loadSampleData() {
         mechanism: 'IED', 
         injuryDescription: '右下肢爆炸傷，大量出血',
         pulse: '120', 
-        bloodPressure: '90/60', 
+        bloodPressureSystolic: '90',
+        bloodPressureDiastolic: '60',
         respRate: '24', 
         spo2: '92',
         evacPriority: 'Urgent', 
@@ -394,11 +443,38 @@ function loadSampleData() {
             document.getElementById(key).value = sampleData[key];
         }
     }
-    document.getElementById('rightLeg').checked = true;
     document.getElementById('tourniquet').checked = true;
     document.getElementById('iv').checked = true;
     document.getElementById('morphine').checked = true;
+    // 新增範例止血帶資料
+    document.getElementById('tq_r_leg_type').value = 'CAT';
+    document.getElementById('tq_r_leg_time').value = '14:30';
+    document.getElementById('tq_r_leg_type').dispatchEvent(new Event('input'));
     alert('✅ 範例資料已載入！您可以直接生成 QR Code 測試。');
+}
+
+function setupTQValidation() {
+    const tqLimbs = ['r_arm', 'r_leg', 'l_arm', 'l_leg'];
+    tqLimbs.forEach(limb => {
+        const typeInput = document.getElementById(`tq_${limb}_type`);
+        const timeInput = document.getElementById(`tq_${limb}_time`);
+
+        const validate = () => {
+            const typeValue = typeInput.value.trim();
+            const timeValue = timeInput.value;
+
+            if (typeValue || timeValue) {
+                typeInput.required = true;
+                timeInput.required = true;
+            } else {
+                typeInput.required = false;
+                timeInput.required = false;
+            }
+        };
+
+        typeInput.addEventListener('input', validate);
+        timeInput.addEventListener('input', validate);
+    });
 }
 
 // --- Service Worker Logic ---
@@ -500,4 +576,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    setupTQValidation(); // 啟用止血帶驗證
 });

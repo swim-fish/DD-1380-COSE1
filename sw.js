@@ -1,7 +1,7 @@
 // sw.js - Stale-While-Revalidate Implementation
 
 // 更新版本號以觸發 Service Worker 的更新流程
-const STATIC_CACHE_NAME = 'tccc-static-v3';
+const STATIC_CACHE_NAME = 'tccc-static-v2';
 
 // 重要的 App Shell 檔案列表保持不變
 const URLS_TO_CACHE = [
@@ -19,7 +19,11 @@ const URLS_TO_CACHE = [
   'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/core-js/3.45.1/minified.min.js',
   'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js',
-  'https://cdn.jsdelivr.net/npm/cbor-x@1.6.0/dist/index.min.js'
+  'https://cdn.jsdelivr.net/npm/cbor-x@1.6.0/dist/index.min.js',
+    // --- START: 新增 Bootstrap CDN 資源 ---
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js',
+  // --- END: 新增 Bootstrap CDN 資源 ---
 ];
 
 // 'install' 事件：快取 App Shell
