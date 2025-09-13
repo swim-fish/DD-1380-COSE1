@@ -46,7 +46,6 @@ textarea { min-height: 100%; resize: vertical; }
     background-color: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #dee2e6;
-    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -68,6 +67,15 @@ textarea { min-height: 100%; resize: vertical; }
 .body-part.selected {
     fill: #dc3545;
     stroke: #a42834;
+}
+
+/* 新增：SVG 內部文字標示樣式 */
+.svg-label {
+    font-size: 24px;
+    font-weight: bold;
+    fill: #495057;
+    pointer-events: none; /* 讓文字不會干擾點擊 */
+    text-anchor: middle;
 }
 
 /* 止血帶區塊樣式 */

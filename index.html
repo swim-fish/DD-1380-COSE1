@@ -98,25 +98,28 @@
                                 <div class="col-6 text-center">
                                     <h4>正面 Front</h4>
                                     <div id="body-diagram-front-container" class="body-diagram-container">
-                                        <!-- Front SVG -->
-                                        <svg id="body-diagram-front" viewBox="0 0 150 300"
-                                            xmlns="http://www.w3.org/2000/svg">
+                                        <svg id="body-diagram-front" viewBox="0 0 150 300" xmlns="http://www.w3.org/2000/svg">
                                             <g class="body-parts-group">
-                                                <path class="body-part" data-location="head_face_neck_front"
-                                                    data-burn="4.5" title="頭/臉/頸 (正面)"
-                                                    d="M60,45 A30,30 0 1,1 90,45 V55 A15,15 0 0,0 75,70 A15,15 0 0,0 60,55 Z" />
-                                                <path class="body-part" data-location="torso_front" data-burn="18"
-                                                    title="軀幹 (正面)" d="M50,75 H100 V160 H50 Z" />
-                                                <path class="body-part" data-location="left_arm_front" data-burn="4.5"
-                                                    title="左臂 (正面)" d="M48,80 L30,90 V150 L48,160 Z" />
-                                                <path class="body-part" data-location="right_arm_front" data-burn="4.5"
-                                                    title="右臂 (正面)" d="M102,80 L120,90 V150 L102,160 Z" />
-                                                <path class="body-part" data-location="perineum" data-burn="1"
-                                                    title="會陰" d="M65,160 H85 L80,170 L70,170 Z" />
-                                                <path class="body-part" data-location="left_leg_front" data-burn="9"
-                                                    title="左腿 (正面)" d="M50,165 L68,165 V280 L50,290 Z" />
-                                                <path class="body-part" data-location="right_leg_front" data-burn="9"
-                                                    title="右腿 (正面)" d="M82,165 L100,165 V280 L82,290 Z" />
+                                                <!-- 頭頸、軀幹、會陰部保持不變 -->
+                                                <path class="body-part" data-location="head_face_neck_front" data-burn="4.5" title="頭/臉/頸 (正面)" d="M60,45 A30,30 0 1,1 90,45 V55 A15,15 0 0,0 75,70 A15,15 0 0,0 60,55 Z" />
+                                                <path class="body-part" data-location="torso_front" data-burn="18" title="軀幹 (正面)" d="M50,75 H100 V160 H50 Z" />
+                                                <path class="body-part" data-location="perineum" data-burn="1" title="會陰" d="M65,160 H85 L80,170 L70,170 Z" />
+
+                                                <!-- START: 交換左右臂與左右腿的路徑 -->
+                                                <!-- 病患右臂 (Right Arm)，但在畫面上是左邊 -->
+                                                <path class="body-part" data-location="right_arm_front" data-burn="4.5" title="右臂 (正面)" d="M48,80 L30,90 V150 L48,160 Z" />
+                                                <!-- 病患左臂 (Left Arm)，但在畫面上是右邊 -->
+                                                <path class="body-part" data-location="left_arm_front" data-burn="4.5" title="左臂 (正面)" d="M102,80 L120,90 V150 L102,160 Z" />
+                                                
+                                                <!-- 病患右腿 (Right Leg)，但在畫面上是左邊 -->
+                                                <path class="body-part" data-location="right_leg_front" data-burn="9" title="右腿 (正面)" d="M50,165 L68,165 V280 L50,290 Z" />
+                                                <!-- 病患左腿 (Left Leg)，但在畫面上是右邊 -->
+                                                <path class="body-part" data-location="left_leg_front" data-burn="9" title="左腿 (正面)" d="M82,165 L100,165 V280 L82,290 Z" />
+                                                <!-- END: 交換左右臂與左右腿的路徑 -->
+
+                                                <!-- 新增：正面左右標示 -->
+                                                <text x="35" y="125" class="svg-label">R</text>
+                                                <text x="115" y="125" class="svg-label">L</text>
                                             </g>
                                         </svg>
                                     </div>
@@ -124,23 +127,19 @@
                                 <div class="col-6 text-center">
                                     <h4>背面 Back</h4>
                                     <div id="body-diagram-back-container" class="body-diagram-container">
-                                        <!-- Back SVG -->
-                                        <svg id="body-diagram-back" viewBox="0 0 150 300"
-                                            xmlns="http://www.w3.org/2000/svg">
+                                        <svg id="body-diagram-back" viewBox="0 0 150 300" xmlns="http://www.w3.org/2000/svg">
                                             <g class="body-parts-group">
-                                                <path class="body-part" data-location="head_face_neck_back"
-                                                    data-burn="4.5" title="頭/頸 (背面)"
-                                                    d="M60,45 A30,30 0 1,1 90,45 V55 A15,15 0 0,0 75,70 A15,15 0 0,0 60,55 Z" />
-                                                <path class="body-part" data-location="torso_back" data-burn="18"
-                                                    title="軀幹 (背面)" d="M50,75 H100 V160 H50 Z" />
-                                                <path class="body-part" data-location="left_arm_back" data-burn="4.5"
-                                                    title="左臂 (背面)" d="M48,80 L30,90 V150 L48,160 Z" />
-                                                <path class="body-part" data-location="right_arm_back" data-burn="4.5"
-                                                    title="右臂 (背面)" d="M102,80 L120,90 V150 L102,160 Z" />
-                                                <path class="body-part" data-location="left_leg_back" data-burn="9"
-                                                    title="左腿 (背面)" d="M50,165 L68,165 V280 L50,290 Z" />
-                                                <path class="body-part" data-location="right_leg_back" data-burn="9"
-                                                    title="右腿 (背面)" d="M82,165 L100,165 V280 L82,290 Z" />
+                                                <!-- 背面圖示路徑不變 -->
+                                                <path class="body-part" data-location="head_face_neck_back" data-burn="4.5" title="頭/頸 (背面)" d="M60,45 A30,30 0 1,1 90,45 V55 A15,15 0 0,0 75,70 A15,15 0 0,0 60,55 Z" />
+                                                <path class="body-part" data-location="torso_back" data-burn="18" title="軀幹 (背面)" d="M50,75 H100 V160 H50 Z" />
+                                                <path class="body-part" data-location="left_arm_back" data-burn="4.5" title="左臂 (背面)" d="M48,80 L30,90 V150 L48,160 Z" />
+                                                <path class="body-part" data-location="right_arm_back" data-burn="4.5" title="右臂 (背面)" d="M102,80 L120,90 V150 L102,160 Z" />
+                                                <path class="body-part" data-location="left_leg_back" data-burn="9" title="左腿 (背面)" d="M50,165 L68,165 V280 L50,290 Z" />
+                                                <path class="body-part" data-location="right_leg_back" data-burn="9" title="右腿 (背面)" d="M82,165 L100,165 V280 L82,290 Z" />
+                                                
+                                                <!-- 新增：背面左右標示 -->
+                                                <text x="35" y="125" class="svg-label">L</text>
+                                                <text x="115" y="125" class="svg-label">R</text>
                                             </g>
                                         </svg>
                                     </div>
@@ -193,14 +192,14 @@
                         <div class="container text-center">
                             <div class="row">
                                 <div class="col">
-                                    <div class="tq-record"><label for="tq_l_arm_type">TQ: Left Arm</label>
+                                    <div class="tq-record"><label for="tq_l_arm_type">TQ: 左手 Left Arm</label>
                                         <div class="tq-record-inputs"><input type="text" id="tq_l_arm_type"
                                                 list="tq-types" placeholder="Type"><input type="time"
                                                 id="tq_l_arm_time"></div>
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="tq-record"><label for="tq_r_arm_type">TQ: Right Arm</label>
+                                    <div class="tq-record"><label for="tq_r_arm_type">TQ: 右手 Right Arm</label>
                                         <div class="tq-record-inputs"><input type="text" id="tq_r_arm_type"
                                                 list="tq-types" placeholder="Type"><input type="time"
                                                 id="tq_r_arm_time"></div>
@@ -209,14 +208,14 @@
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <div class="tq-record"><label for="tq_l_leg_type">TQ: Left Leg</label>
+                                    <div class="tq-record"><label for="tq_l_leg_type">TQ: 左腿 Left Leg</label>
                                         <div class="tq-record-inputs"><input type="text" id="tq_l_leg_type"
                                                 list="tq-types" placeholder="Type"><input type="time"
                                                 id="tq_l_leg_time"></div>
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="tq-record"><label for="tq_r_leg_type">TQ: Right Leg</label>
+                                    <div class="tq-record"><label for="tq_r_leg_type">TQ: 右腿 Right Leg</label>
                                         <div class="tq-record-inputs"><input type="text" id="tq_r_leg_type"
                                                 list="tq-types" placeholder="Type"><input type="time"
                                                 id="tq_r_leg_time"></div>
