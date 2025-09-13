@@ -89,72 +89,146 @@
                     </div>
                 </div>
 
-                <div class="form-section">
+                <div class="container form-section">
                     <h3>傷勢評估 Injury Assessment</h3>
-                    <div class="form-grid">
-                        <div class="form-group"><label>受傷時間 Time of Injury</label><input type="datetime-local"
-                                id="injuryTime" required></div>
-                        <div class="form-group"><label>受傷機制 Mechanism of Injury</label><select id="mechanism" required>
-                                <option value="">選擇機制</option>
-                                <option value="Artillery">砲擊 Artillery</option>
-                                <option value="Burn">燒燙傷 Burn</option>
-                                <option value="Fall">墜落 Fall</option>
-                                <option value="Grenade">手榴彈 Grenade</option>
-                                <option value="GSW">槍傷 GSW</option>
-                                <option value="IED">爆炸裝置 IED</option>
-                                <option value="Landmine">地雷 Landmine</option>
-                                <option value="MVC">車輛事故 MVC</option>
-                                <option value="RPG">火箭彈 RPG</option>
-                                <option value="Other">其他 Other</option>
-                            </select></div>
-                    </div>
-
-                    <div class="form-section" style="margin-top: 20px;">
-                        <h4>止血帶紀錄 (Tourniquet Application)</h4>
-                        <div class="tourniquet-section">
-                            <div class="container text-center">
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="tq-record"><label for="tq_l_arm_type">TQ: Left Arm</label>
-                                            <div class="tq-record-inputs"><input type="text" id="tq_l_arm_type"
-                                                    list="tq-types" placeholder="Type"><input type="time"
-                                                    id="tq_l_arm_time"></div>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="tq-record"><label for="tq_r_arm_type">TQ: Right Arm</label>
-                                            <div class="tq-record-inputs"><input type="text" id="tq_r_arm_type"
-                                                    list="tq-types" placeholder="Type"><input type="time"
-                                                    id="tq_r_arm_time"></div>
-                                        </div>
+                    <div class="row">
+                        <!-- START: SVG 圖示區塊 -->
+                        <div class="col-md-6 col-lg-5">
+                            <div class="row">
+                                <div class="col-6 text-center">
+                                    <h4>正面 Front</h4>
+                                    <div id="body-diagram-front-container" class="body-diagram-container">
+                                        <!-- Front SVG -->
+                                        <svg id="body-diagram-front" viewBox="0 0 150 300"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <g class="body-parts-group">
+                                                <path class="body-part" data-location="head_face_neck_front"
+                                                    data-burn="4.5" title="頭/臉/頸 (正面)"
+                                                    d="M60,45 A30,30 0 1,1 90,45 V55 A15,15 0 0,0 75,70 A15,15 0 0,0 60,55 Z" />
+                                                <path class="body-part" data-location="torso_front" data-burn="18"
+                                                    title="軀幹 (正面)" d="M50,75 H100 V160 H50 Z" />
+                                                <path class="body-part" data-location="left_arm_front" data-burn="4.5"
+                                                    title="左臂 (正面)" d="M48,80 L30,90 V150 L48,160 Z" />
+                                                <path class="body-part" data-location="right_arm_front" data-burn="4.5"
+                                                    title="右臂 (正面)" d="M102,80 L120,90 V150 L102,160 Z" />
+                                                <path class="body-part" data-location="perineum" data-burn="1"
+                                                    title="會陰" d="M65,160 H85 L80,170 L70,170 Z" />
+                                                <path class="body-part" data-location="left_leg_front" data-burn="9"
+                                                    title="左腿 (正面)" d="M50,165 L68,165 V280 L50,290 Z" />
+                                                <path class="body-part" data-location="right_leg_front" data-burn="9"
+                                                    title="右腿 (正面)" d="M82,165 L100,165 V280 L82,290 Z" />
+                                            </g>
+                                        </svg>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="tq-record"><label for="tq_l_leg_type">TQ: Left Leg</label>
-                                            <div class="tq-record-inputs"><input type="text" id="tq_l_leg_type"
-                                                    list="tq-types" placeholder="Type"><input type="time"
-                                                    id="tq_l_leg_time"></div>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="tq-record"><label for="tq_r_leg_type">TQ: Right Leg</label>
-                                            <div class="tq-record-inputs"><input type="text" id="tq_r_leg_type"
-                                                    list="tq-types" placeholder="Type"><input type="time"
-                                                    id="tq_r_leg_time"></div>
-                                        </div>
+                                <div class="col-6 text-center">
+                                    <h4>背面 Back</h4>
+                                    <div id="body-diagram-back-container" class="body-diagram-container">
+                                        <!-- Back SVG -->
+                                        <svg id="body-diagram-back" viewBox="0 0 150 300"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <g class="body-parts-group">
+                                                <path class="body-part" data-location="head_face_neck_back"
+                                                    data-burn="4.5" title="頭/頸 (背面)"
+                                                    d="M60,45 A30,30 0 1,1 90,45 V55 A15,15 0 0,0 75,70 A15,15 0 0,0 60,55 Z" />
+                                                <path class="body-part" data-location="torso_back" data-burn="18"
+                                                    title="軀幹 (背面)" d="M50,75 H100 V160 H50 Z" />
+                                                <path class="body-part" data-location="left_arm_back" data-burn="4.5"
+                                                    title="左臂 (背面)" d="M48,80 L30,90 V150 L48,160 Z" />
+                                                <path class="body-part" data-location="right_arm_back" data-burn="4.5"
+                                                    title="右臂 (背面)" d="M102,80 L120,90 V150 L102,160 Z" />
+                                                <path class="body-part" data-location="left_leg_back" data-burn="9"
+                                                    title="左腿 (背面)" d="M50,165 L68,165 V280 L50,290 Z" />
+                                                <path class="body-part" data-location="right_leg_back" data-burn="9"
+                                                    title="右腿 (背面)" d="M82,165 L100,165 V280 L82,290 Z" />
+                                            </g>
+                                        </svg>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <datalist id="tq-types">
-                            <option value="CAT"></option>
-                            <option value="SAM"></option>
-                        </datalist>
-                    </div>
+                        <!-- END: SVG 圖示區塊 -->
 
-                    <div class="form-group" style="margin-top: 20px;"><label>傷勢描述 Injury Description</label><textarea
-                            id="injuryDescription" placeholder="詳細描述傷勢..."></textarea></div>
+                        <!-- START: 右側資訊欄 -->
+                        <div class="col-md-6 col-lg-7">
+                            <div class="row">
+                                <div class="col-sm-6 mb-3">
+                                    <label for="injuryTime" class="form-label">受傷時間 Time of Injury</label>
+                                    <input type="datetime-local" class="form-control" id="injuryTime" required>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label for="mechanism" class="form-label">受傷機制 Mechanism of Injury</label>
+                                    <select class="form-select" id="mechanism" required>
+                                        <option value="">選擇機制</option>
+                                        <option value="Artillery">砲擊 Artillery</option>
+                                        <option value="Burn">燒燙傷 Burn</option>
+                                        <option value="Fall">墜落 Fall</option>
+                                        <option value="Grenade">手榴彈 Grenade</option>
+                                        <option value="GSW">槍傷 GSW</option>
+                                        <option value="IED">爆炸裝置 IED</option>
+                                        <option value="Landmine">地雷 Landmine</option>
+                                        <option value="MVC">車輛事故 MVC</option>
+                                        <option value="RPG">火箭彈 RPG</option>
+                                        <option value="Other">其他 Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="injuryDescription" class="form-label">傷勢描述 Injury Description</label>
+                                <textarea class="form-control" id="injuryDescription" placeholder="詳細描述傷勢..."
+                                    rows="6"></textarea>
+                            </div>
+                            <div class="mt-3 p-3 bg-light border rounded">
+                                <h5>總燒燙傷面積 (TBSA %):</h5>
+                                <div id="burn-percentage-display" class="stat-value fs-2 text-danger">0%</div>
+                            </div>
+                        </div>
+                        <!-- END: 右側資訊欄 -->
+                    </div>
+                </div>
+
+                <div class="container form-section" style="margin-top: 20px;">
+                    <h4>止血帶紀錄 (Tourniquet Application)</h4>
+                    <div class="tourniquet-section">
+                        <div class="container text-center">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="tq-record"><label for="tq_l_arm_type">TQ: Left Arm</label>
+                                        <div class="tq-record-inputs"><input type="text" id="tq_l_arm_type"
+                                                list="tq-types" placeholder="Type"><input type="time"
+                                                id="tq_l_arm_time"></div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="tq-record"><label for="tq_r_arm_type">TQ: Right Arm</label>
+                                        <div class="tq-record-inputs"><input type="text" id="tq_r_arm_type"
+                                                list="tq-types" placeholder="Type"><input type="time"
+                                                id="tq_r_arm_time"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="tq-record"><label for="tq_l_leg_type">TQ: Left Leg</label>
+                                        <div class="tq-record-inputs"><input type="text" id="tq_l_leg_type"
+                                                list="tq-types" placeholder="Type"><input type="time"
+                                                id="tq_l_leg_time"></div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="tq-record"><label for="tq_r_leg_type">TQ: Right Leg</label>
+                                        <div class="tq-record-inputs"><input type="text" id="tq_r_leg_type"
+                                                list="tq-types" placeholder="Type"><input type="time"
+                                                id="tq_r_leg_time"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <datalist id="tq-types">
+                        <option value="CAT"></option>
+                        <option value="SAM"></option>
+                    </datalist>
                 </div>
 
                 <div class="form-section">

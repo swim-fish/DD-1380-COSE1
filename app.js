@@ -4,6 +4,32 @@ let currentName = '';
 let currentidLast4 = '';
 let maxVitalsCols = 6;
 
+const burnPercentageMap = {
+    'head_face_neck_front': 4.5,
+    'head_face_neck_back': 4.5,
+    'torso_front': 18,
+    'torso_back': 18,
+    'left_arm_front': 4.5,
+    'left_arm_back': 4.5,
+    'right_arm_front': 4.5,
+    'right_arm_back': 4.5,
+    'perineum': 1,
+    'left_leg_front': 9,
+    'left_leg_back': 9,
+    'right_leg_front': 9,
+    'right_leg_back': 9,
+};
+
+function calculateBurnPercentage() {
+    let total = 0;
+    document.querySelectorAll('.body-part.selected').forEach(part => {
+        const percentage = parseFloat(part.dataset.burn || 0);
+        total += percentage;
+    });
+    document.getElementById('burn-percentage-display').textContent = `${total}%`;
+    return total;
+}
+
 async function startCamera() {
     try {
         codeReader = new ZXing.BrowserMultiFormatReader();
@@ -143,19 +169,18 @@ function base45Decode(str) {
 
 
 function collectFormData() {
-    const treatments = [];
-    const treatmentIds = ['tourniquet', 'chestSeal', 'npa', 'decompress', 'iv', 'morphine', 'antibiotics', 'hypothermia'];
-    treatmentIds.forEach(id => {
-        const checkbox = document.getElementById(id);
-        if (checkbox && checkbox.checked) {
-            treatments.push(id);
-        }
+    const locations = [];
+    document.querySelectorAll('.body-part.selected').forEach(part => {
+        locations.push(part.dataset.location);
     });
-    
+    const total_burn_percentage = calculateBurnPercentage();
+
     const injuryData = {
         time: document.getElementById('injuryTime').value,
         mechanism: document.getElementById('mechanism').value,
-        description: document.getElementById('injuryDescription').value
+        description: document.getElementById('injuryDescription').value,
+        locations: locations,
+        total_burn_percentage: total_burn_percentage
     };
 
     const tqLimbs = ['r_arm', 'r_leg', 'l_arm', 'l_leg'];
@@ -197,9 +222,18 @@ function collectFormData() {
             vitals_history.push(record);
         }
     }
+    
+    const treatments = [];
+    const treatmentIds = ['tourniquet', 'chestSeal', 'npa', 'decompress', 'iv', 'morphine', 'antibiotics', 'hypothermia'];
+    treatmentIds.forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox && checkbox.checked) {
+            treatments.push(id);
+        }
+    });
 
     return {
-        version: "1.4",
+        version: "1.5",
         timestamp: new Date().toISOString(),
         patient: { 
             battleRoster: document.getElementById('patientBattleRoster').value,
@@ -245,8 +279,9 @@ document.getElementById('tcccForm').addEventListener('submit', async function(e)
     document.getElementById('originalSize').textContent = originalSize;
     document.getElementById('compressedSize').textContent = compressedSize;
     document.getElementById('qrDataSize').textContent = qrDataSize;
-    document.getElementById('compressionRatio').textContent = Math.round((1 - compressedSize / originalSize) * 100) + '%';
-    
+    document.getElementById('compressionRatio').textContent = Math.round((1 - compressedSize / originalSize) * 100) + '%' + " / " +
+        + Math.round((1 - qrDataSize / originalSize) * 100) + '%';
+
     currentName = tcccData.patient.name;
     currentidLast4 = tcccData.patient.idLast4;
 
@@ -278,6 +313,10 @@ function clearForm() {
         document.getElementById('outputSection').style.display = 'none';
         document.getElementById('scanResult').style.display = 'none';
         initializeVitalsTable(1);
+        document.querySelectorAll('.body-part.selected').forEach(part => {
+            part.classList.remove('selected');
+        });
+        calculateBurnPercentage();
     }
 }
 
@@ -331,7 +370,7 @@ async function processQRCode(qrData) {
             const payload = CBOR.decode(payloadBytes);
             alert('✅ QR Code 讀取與驗證成功！');
             displayDecodedData(payload);
-            fillFormFromData(payload);
+            fillFormFromData(payload); // Corrected function name
         } else {
             throw new Error('簽章驗證失敗');
         }
@@ -371,6 +410,17 @@ function displayDecodedData(data) {
     } else {
         tqHtml = '<p><strong>止血帶紀錄:</strong> 無</p>';
     }
+    
+    let injuryLocationHtml = '';
+    const locations = get(data, 'injury.locations', []);
+    if (locations.length > 0) {
+        injuryLocationHtml = `<p><strong>傷勢部位:</strong> ${locations.join(', ')}</p>`;
+    }
+    const burnPercentage = get(data, 'injury.total_burn_percentage', 'N/A');
+    if(burnPercentage !== 'N/A') {
+        injuryLocationHtml += `<p><strong>總燒燙傷面積:</strong> ${burnPercentage}%</p>`;
+    }
+
 
     let vitalsHtml = '<h5>生命徵象紀錄</h5>';
     const vitalsHistory = get(data, 'vitals_history', []);
@@ -413,6 +463,7 @@ function displayDecodedData(data) {
             <hr>
             <p><strong>受傷時間:</strong> ${new Date(get(data, 'injury.time', new Date())).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</p>
             <p><strong>受傷機制:</strong> ${get(data, 'injury.mechanism')}</p>
+            ${injuryLocationHtml}
             ${tqHtml}
             <p><strong>已實施治療:</strong> ${get(data, 'treatments.applied', []).join(', ') || '無'}</p>
             <hr>
@@ -423,7 +474,7 @@ function displayDecodedData(data) {
     scanResult.scrollIntoView({ behavior: 'smooth' });
 }
 
-function fillFormFromData(data) {
+function fillFormFromData(data) { // Corrected function name
     const patient = data.patient || {};
     const injury = data.injury || {};
     const treatments = data.treatments || {};
@@ -440,6 +491,19 @@ function fillFormFromData(data) {
     document.getElementById('injuryTime').value = injury.time || '';
     document.getElementById('mechanism').value = injury.mechanism || '';
     document.getElementById('injuryDescription').value = injury.description || '';
+    
+    document.querySelectorAll('.body-part').forEach(part => {
+        part.classList.remove('selected');
+    });
+    if (injury.locations && Array.isArray(injury.locations)) {
+        injury.locations.forEach(location => {
+            const part = document.querySelector(`.body-part[data-location="${location}"]`);
+            if (part) {
+                part.classList.add('selected');
+            }
+        });
+    }
+    calculateBurnPercentage();
 
     const tqLimbs = ['r_arm', 'r_leg', 'l_arm', 'l_leg'];
     tqLimbs.forEach(limb => {
@@ -486,38 +550,47 @@ function getCurrentTime() {
 }
 
 function loadSampleData() {
-    // 1. 先清空表單，確保狀態乾淨
-    document.getElementById('tcccForm').reset();
-    document.querySelectorAll('.btn-check').forEach(cb => cb.checked = false);
+    clearForm();
 
-    // 2. 填寫病患、傷勢等基本資料
     const sampleData = {
-        patientBattleRoster: 'BR-101-001', name: '王大明', service: '陸軍',
-        unit: '機步234旅', idLast4: '0001', bloodType: 'O+', allergies: 'Penicillin',
-        injuryTime: new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
-        mechanism: 'IED', injuryDescription: '右下肢爆炸傷，大量出血',
-        evacPriority: 'Urgent', medicName: '李醫官'
+        patientBattleRoster: 'M234-1234',
+        name: '王大明',
+        service: '陸軍',
+        unit: '機步234旅',
+        idLast4: '1234',
+        bloodType: 'O+',
+        allergies: 'Penicillin',
+        injuryTime: new Date(new Date().getTime() - (60 * 60 * 1000) - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16), // 1 hour ago
+        mechanism: 'IED',
+        injuryDescription: 'GSW to Right Leg, Tourniquet applied. Multiple shrapnel wounds to torso and left arm.',
+        evacPriority: 'Urgent',
+        medicName: '李醫官'
     };
     for (const key in sampleData) {
         if(document.getElementById(key)) {
             document.getElementById(key).value = sampleData[key];
         }
     }
-    
-    // 3. 勾選治療措施
-    document.getElementById('tourniquet').checked = true;
+
+    document.getElementById('decompress').checked = true;
     document.getElementById('iv').checked = true;
     document.getElementById('morphine').checked = true;
+    document.getElementById('antibiotics').checked = true;
+    document.getElementById('hypothermia').checked = true;
     
-    // 4. 填寫止血帶
     document.getElementById('tq_r_leg_type').value = 'CAT';
-    document.getElementById('tq_r_leg_time').value = '14:30';
+    document.getElementById('tq_r_leg_time').value = '09:45';
     document.getElementById('tq_r_leg_type').dispatchEvent(new Event('input'));
+    
+    document.querySelector('[data-location="torso_front"]').classList.add('selected');
+    document.querySelector('[data-location="right_leg_front"]').classList.add('selected');
+    document.querySelector('[data-location="left_arm_front"]').classList.add('selected');
+    calculateBurnPercentage();
 
-    // 5. 準備並填寫生命徵象表格
     const vitalsHistory = [
-        { time: '14:35', pulse: 120, blood_pressure_systolic: 90, blood_pressure_diastolic: 60, resp_rate: 24, spo2: 92, avpu: 'Pain', pain_scale: 8 },
-        { time: '14:50', pulse: 110, blood_pressure_systolic: 95, blood_pressure_diastolic: 65, resp_rate: 22, spo2: 94, avpu: 'Pain', pain_scale: 7 }
+        { time: '09:50', pulse: 130, blood_pressure_systolic: 90, blood_pressure_diastolic: 50, resp_rate: 28, spo2: 91, avpu: 'Pain', pain_scale: 9 },
+        { time: '10:05', pulse: 125, blood_pressure_systolic: 95, blood_pressure_diastolic: 55, resp_rate: 26, spo2: 93, avpu: 'Pain', pain_scale: 8 },
+        { time: '10:20', pulse: 120, blood_pressure_systolic: 100, blood_pressure_diastolic: 60, resp_rate: 24, spo2: 95, avpu: 'Verbal', pain_scale: 7 }
     ];
 
     initializeVitalsTable(vitalsHistory.length);
@@ -567,7 +640,7 @@ function setupTQValidation() {
 // --- START: 生命徵象表格管理 ---
 const vitalsMetrics = [
     { label: '脈搏', key: 'pulse', type: 'number', placeholder: 'bpm' },
-    { label: '血壓', key: 'bloodPressure' }, // 簡化定義
+    { label: '血壓', key: 'bloodPressure' },
     { label: '呼吸', key: 'resp_rate', type: 'number', placeholder: 'bpm' },
     { label: '血氧', key: 'spo2', type: 'number', placeholder: '%' },
     { label: 'AVPU', key: 'avpu', type: 'select' },
@@ -622,7 +695,6 @@ function addColumn(isFirst = false) {
              const select = document.createElement('select');
              select.className = 'form-select form-select-sm';
              select.dataset.key = metric.key;
-             // --- START: 優化 AVPU 選項 ---
              const avpuOptions = {
                 '': '選擇...',
                 'Alert': 'A (清醒)',
@@ -636,7 +708,6 @@ function addColumn(isFirst = false) {
                 option.textContent = text;
                 select.appendChild(option);
              }
-             // --- END: 優化 AVPU 選項 ---
              cell.appendChild(select);
         } else {
             const input = document.createElement('input');
@@ -674,6 +745,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('add-vitals-col').addEventListener('click', () => addColumn(false));
     document.getElementById('remove-vitals-col').addEventListener('click', removeColumn);
     
+    document.querySelectorAll('.body-part').forEach(part => {
+        part.addEventListener('click', () => {
+            part.classList.toggle('selected');
+            calculateBurnPercentage();
+        });
+    });
+
     let swRegistration = null;
     let currentVersion = 'unknown';
     let newWorkerVersion = 'unknown';
@@ -770,16 +848,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setupTQValidation();
-
     const backToTopButton = document.getElementById("back-to-top");
+
+    let lastScrollTop = 0;
     window.addEventListener("scroll", () => {
-        if (window.pageYOffset > 300) { // 滾動超過 300px 時顯示
-            backToTopButton.style.display = "flex";
-            
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        if (scrollTop > lastScrollTop && scrollTop > 200) {
+            backToTopButton.classList.add("show");
         } else {
-            backToTopButton.style.display = "none";
+            backToTopButton.classList.remove("show");
         }
+        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
     });
+
     backToTopButton.addEventListener("click", (e) => {
         e.preventDefault();
         window.scrollTo({ top: 0, behavior: "smooth" });

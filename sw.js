@@ -1,6 +1,6 @@
 // sw.js - Stale-While-Revalidate Implementation
 
-const STATIC_CACHE_NAME = 'tccc-static-v8';
+const STATIC_CACHE_NAME = 'tccc-static-v9';
 
 const URLS_TO_CACHE = [
   './', 
