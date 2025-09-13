@@ -53,7 +53,8 @@ message Injury {
   optional Tourniquet tq_l_arm = 6;
   optional Tourniquet tq_l_leg = 7;
   repeated string locations = 8; 
-  optional int32 total_burn_percentage = 9; // 新增：總燒燙傷面積
+  optional int32 total_burn_percentage = 9;
+  repeated string trauma_locations = 10;
 }
 
 // 治療措施

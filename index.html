@@ -91,33 +91,70 @@
 
                 <div class="container form-section">
                     <h3>傷勢評估 Injury Assessment</h3>
+
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <div class="form-check form-switch fs-5">
+                            <input class="form-check-input" type="checkbox" role="switch" id="injury-mode-toggle">
+                            <label class="form-check-label" for="injury-mode-toggle" id="injury-mode-label">燒燙傷</label>
+                        </div>
+                    </div>
+
                     <div class="row">
-                        <!-- START: SVG 圖示區塊 -->
                         <div class="col-md-6 col-lg-5">
                             <div class="row">
                                 <div class="col-6 text-center">
                                     <h4>正面 Front</h4>
-                                    <div id="body-diagram-front-container" class="body-diagram-container">
-                                        <svg id="body-diagram-front" viewBox="0 0 150 300" xmlns="http://www.w3.org/2000/svg">
+                                    <div class="body-diagram-container">
+                                        <svg id="body-diagram-front" class="body-diagram" viewBox="0 0 150 300"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <defs>
+                                                <!-- 紅底 + 藍左斜線（/） -->
+                                                <pattern id="blue-hatch" patternUnits="userSpaceOnUse" width="8"
+                                                    height="8">
+                                                    <!-- 底色 -->
+                                                    <rect width="8" height="8" fill="#dc3545" />
+                                                    <!-- 左斜線（/） -->
+                                                    <path d="M-2,10 l12,-12 M-2,2 l12,-12" stroke="#0d6efd"
+                                                        stroke-width="1" />
+                                                </pattern>
+
+                                                <!-- 藍底 + 紅右斜線（\） -->
+                                                <pattern id="red-hatch" patternUnits="userSpaceOnUse" width="8"
+                                                    height="8">
+                                                    <!-- 底色 -->
+                                                    <rect width="8" height="8" fill="#0d6efd" />
+                                                    <!-- 右斜線（\） -->
+                                                    <path d="M-2,-2 l12,12 M6,-2 l12,12" stroke="#dc3545"
+                                                        stroke-width="1" />
+                                                </pattern>
+                                            </defs>
                                             <g class="body-parts-group">
-                                                <!-- 頭頸、軀幹、會陰部保持不變 -->
-                                                <path class="body-part" data-location="head_face_neck_front" data-burn="4.5" title="頭/臉/頸 (正面)" d="M60,45 A30,30 0 1,1 90,45 V55 A15,15 0 0,0 75,70 A15,15 0 0,0 60,55 Z" />
-                                                <path class="body-part" data-location="torso_front" data-burn="18" title="軀幹 (正面)" d="M50,75 H100 V160 H50 Z" />
-                                                <path class="body-part" data-location="perineum" data-burn="1" title="會陰" d="M65,160 H85 L80,170 L70,170 Z" />
-
-                                                <!-- START: 交換左右臂與左右腿的路徑 -->
-                                                <!-- 病患右臂 (Right Arm)，但在畫面上是左邊 -->
-                                                <path class="body-part" data-location="right_arm_front" data-burn="4.5" title="右臂 (正面)" d="M48,80 L30,90 V150 L48,160 Z" />
-                                                <!-- 病患左臂 (Left Arm)，但在畫面上是右邊 -->
-                                                <path class="body-part" data-location="left_arm_front" data-burn="4.5" title="左臂 (正面)" d="M102,80 L120,90 V150 L102,160 Z" />
-                                                
-                                                <!-- 病患右腿 (Right Leg)，但在畫面上是左邊 -->
-                                                <path class="body-part" data-location="right_leg_front" data-burn="9" title="右腿 (正面)" d="M50,165 L68,165 V280 L50,290 Z" />
-                                                <!-- 病患左腿 (Left Leg)，但在畫面上是右邊 -->
-                                                <path class="body-part" data-location="left_leg_front" data-burn="9" title="左腿 (正面)" d="M82,165 L100,165 V280 L82,290 Z" />
-                                                <!-- END: 交換左右臂與左右腿的路徑 -->
-
-                                                <!-- 新增：正面左右標示 -->
+                                                <path class="body-part" data-view="front"
+                                                    data-burn-part="head_face_neck_front" data-trauma-target="face"
+                                                    data-side-target="face" data-burn="4.5" title="頭/臉/頸"
+                                                    d="M60,45 A30,30 0 1,1 90,45 V55 A15,15 0 0,0 75,70 A15,15 0 0,0 60,55 Z" />
+                                                <path class="body-part" data-view="front" data-burn-part="torso_front"
+                                                    data-trauma-target="chest" data-side-target="chest" data-burn="18"
+                                                    title="軀幹 (正面)" d="M50,75 H100 V160 H50 Z" />
+                                                <path class="body-part" data-view="front" data-burn-part="perineum"
+                                                    data-trauma-target="buttocks" data-side-target="buttocks"
+                                                    data-burn="1" title="會陰/臀部" d="M65,160 H85 L80,170 L70,170 Z" />
+                                                <path class="body-part" data-view="front"
+                                                    data-burn-part="right_arm_front" data-trauma-target="hand"
+                                                    data-side-target="right_hand" data-burn="4.5" title="右臂 (正面)"
+                                                    d="M48,80 L30,90 V150 L48,160 Z" />
+                                                <path class="body-part" data-view="front"
+                                                    data-burn-part="left_arm_front" data-trauma-target="hand"
+                                                    data-side-target="left_hand" data-burn="4.5" title="左臂 (正面)"
+                                                    d="M102,80 L120,90 V150 L102,160 Z" />
+                                                <path class="body-part" data-view="front"
+                                                    data-burn-part="right_leg_front" data-trauma-target="leg"
+                                                    data-side-target="right_leg" data-burn="9" title="右腿 (正面)"
+                                                    d="M50,165 L68,165 V280 L50,290 Z" />
+                                                <path class="body-part" data-view="front"
+                                                    data-burn-part="left_leg_front" data-trauma-target="leg"
+                                                    data-side-target="left_leg" data-burn="9" title="左腿 (正面)"
+                                                    d="M82,165 L100,165 V280 L82,290 Z" />
                                                 <text x="35" y="125" class="svg-label">R</text>
                                                 <text x="115" y="125" class="svg-label">L</text>
                                             </g>
@@ -126,18 +163,30 @@
                                 </div>
                                 <div class="col-6 text-center">
                                     <h4>背面 Back</h4>
-                                    <div id="body-diagram-back-container" class="body-diagram-container">
-                                        <svg id="body-diagram-back" viewBox="0 0 150 300" xmlns="http://www.w3.org/2000/svg">
+                                    <div class="body-diagram-container">
+                                        <svg id="body-diagram-back" class="body-diagram" viewBox="0 0 150 300"
+                                            xmlns="http://www.w3.org/2000/svg">
                                             <g class="body-parts-group">
-                                                <!-- 背面圖示路徑不變 -->
-                                                <path class="body-part" data-location="head_face_neck_back" data-burn="4.5" title="頭/頸 (背面)" d="M60,45 A30,30 0 1,1 90,45 V55 A15,15 0 0,0 75,70 A15,15 0 0,0 60,55 Z" />
-                                                <path class="body-part" data-location="torso_back" data-burn="18" title="軀幹 (背面)" d="M50,75 H100 V160 H50 Z" />
-                                                <path class="body-part" data-location="left_arm_back" data-burn="4.5" title="左臂 (背面)" d="M48,80 L30,90 V150 L48,160 Z" />
-                                                <path class="body-part" data-location="right_arm_back" data-burn="4.5" title="右臂 (背面)" d="M102,80 L120,90 V150 L102,160 Z" />
-                                                <path class="body-part" data-location="left_leg_back" data-burn="9" title="左腿 (背面)" d="M50,165 L68,165 V280 L50,290 Z" />
-                                                <path class="body-part" data-location="right_leg_back" data-burn="9" title="右腿 (背面)" d="M82,165 L100,165 V280 L82,290 Z" />
-                                                
-                                                <!-- 新增：背面左右標示 -->
+                                                <path class="body-part" data-view="back"
+                                                    data-burn-part="head_face_neck_back" data-trauma-target="face"
+                                                    data-side-target="face" data-burn="4.5" title="頭/頸 (背面)"
+                                                    d="M60,45 A30,30 0 1,1 90,45 V55 A15,15 0 0,0 75,70 A15,15 0 0,0 60,55 Z" />
+                                                <path class="body-part" data-view="back" data-burn-part="torso_back"
+                                                    data-trauma-target="chest" data-side-target="chest" data-burn="18"
+                                                    title="軀幹 (背面)" d="M50,75 H100 V160 H50 Z" />
+                                                <path class="body-part" data-view="back" data-burn-part="left_arm_back"
+                                                    data-trauma-target="hand" data-side-target="left_hand"
+                                                    data-burn="4.5" title="左臂 (背面)" d="M48,80 L30,90 V150 L48,160 Z" />
+                                                <path class="body-part" data-view="back" data-burn-part="right_arm_back"
+                                                    data-trauma-target="hand" data-side-target="right_hand"
+                                                    data-burn="4.5" title="右臂 (背面)"
+                                                    d="M102,80 L120,90 V150 L102,160 Z" />
+                                                <path class="body-part" data-view="back" data-burn-part="left_leg_back"
+                                                    data-trauma-target="leg" data-side-target="left_leg" data-burn="9"
+                                                    title="左腿 (背面)" d="M50,165 L68,165 V280 L50,290 Z" />
+                                                <path class="body-part" data-view="back" data-burn-part="right_leg_back"
+                                                    data-trauma-target="leg" data-side-target="right_leg" data-burn="9"
+                                                    title="右腿 (背面)" d="M82,165 L100,165 V280 L82,290 Z" />
                                                 <text x="35" y="125" class="svg-label">L</text>
                                                 <text x="115" y="125" class="svg-label">R</text>
                                             </g>
@@ -146,9 +195,7 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- END: SVG 圖示區塊 -->
 
-                        <!-- START: 右側資訊欄 -->
                         <div class="col-md-6 col-lg-7">
                             <div class="row">
                                 <div class="col-sm-6 mb-3">
@@ -180,6 +227,10 @@
                             <div class="mt-3 p-3 bg-light border rounded">
                                 <h5>總燒燙傷面積 (TBSA %):</h5>
                                 <div id="burn-percentage-display" class="stat-value fs-2 text-danger">0%</div>
+                            </div>
+                            <div id="trauma-info" class="mt-3 p-3 bg-light border rounded d-none">
+                                <h5>創傷部位:</h5>
+                                <p>請點擊左側人體圖示的主要區塊以記錄詳細創傷部位。</p>
                             </div>
                         </div>
                         <!-- END: 右側資訊欄 -->
@@ -356,6 +407,24 @@
         </div>
         <div class="card" id="scanResult" style="display: none; margin-top: 20px;">
             <div id="decodedData"></div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="traumaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="traumaModalLabel">詳細創傷部位</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center" id="traumaModalBody">
+                    <!-- Detailed SVG will be dynamically inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">確認</button>
+                </div>
+            </div>
         </div>
     </div>
 
