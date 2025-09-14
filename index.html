@@ -92,20 +92,24 @@
                 <div class="container form-section">
                     <h3>傷勢評估 Injury Assessment</h3>
 
-                    <div class="d-flex justify-content-center align-items-center mb-3">
-                        <div class="form-check form-switch fs-5">
-                            <input class="form-check-input" type="checkbox" role="switch" id="injury-mode-toggle">
-                            <label class="form-check-label" for="injury-mode-toggle" id="injury-mode-label">燒燙傷</label>
-                        </div>
-                    </div>
-
                     <div class="row">
                         <div class="col-md-6 col-lg-5">
+                            <div class="row">
+                                <div class="d-flex justify-content-center align-items-center mb-3">
+                                    <div class="form-check form-switch fs-5">
+                                        <label class="form-label">編輯模式 Edit Mode:</label>
+                                        <input class="form-check-input" type="checkbox" role="switch"
+                                            id="injury-mode-toggle">
+                                        <label class="form-check-label" for="injury-mode-toggle"
+                                            id="injury-mode-label">燒燙傷</label>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-6 text-center">
                                     <h4>正面 Front</h4>
                                     <div class="body-diagram-container">
-                                        <svg id="body-diagram-front" class="body-diagram" viewBox="0 0 150 300"
+                                        <svg id="body-diagram-front" class="body-diagram" viewBox="0 0 200 300"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <defs>
                                                 <!-- 紅底 + 藍左斜線（/） -->
@@ -128,35 +132,46 @@
                                                         stroke-width="1" />
                                                 </pattern>
                                             </defs>
-                                            <g class="body-parts-group">
+                                            <g class="body-parts-group" id="g7">
                                                 <path class="body-part" data-view="front"
                                                     data-burn-part="head_face_neck_front" data-trauma-target="face"
-                                                    data-side-target="face" data-burn="4.5" title="頭/臉/頸"
-                                                    d="M60,45 A30,30 0 1,1 90,45 V55 A15,15 0 0,0 75,70 A15,15 0 0,0 60,55 Z" />
+                                                    data-side-target="face" data-burn="4.5" title="頭/頸 (正面)"
+                                                    d="m 85,55.980762 a 30,30 0 1 1 30,0 v 10 a 15,15 0 0 0 -15,15 15,15 0 0 0 -15,-15 z"
+                                                    id="path1" />
                                                 <path class="body-part" data-view="front" data-burn-part="torso_front"
                                                     data-trauma-target="chest" data-side-target="chest" data-burn="18"
-                                                    title="軀幹 (正面)" d="M50,75 H100 V160 H50 Z" />
+                                                    title="軀幹 (正面)" d="m 75,85.980762 h 50 V 170.98076 H 75 Z"
+                                                    id="path2" />
                                                 <path class="body-part" data-view="front" data-burn-part="perineum"
                                                     data-trauma-target="buttocks" data-side-target="buttocks"
-                                                    data-burn="1" title="會陰/臀部" d="M65,160 H85 L80,170 L70,170 Z" />
-                                                <path class="body-part" data-view="front"
-                                                    data-burn-part="right_arm_front" data-trauma-target="hand"
-                                                    data-side-target="right_hand" data-burn="4.5" title="右臂 (正面)"
-                                                    d="M48,80 L30,90 V150 L48,160 Z" />
+                                                    data-burn="1" title="會陰/臀部" d="m 90,175 h 20 l -5,10 H 95 Z"
+                                                    id="path5" />
                                                 <path class="body-part" data-view="front"
                                                     data-burn-part="left_arm_front" data-trauma-target="hand"
                                                     data-side-target="left_hand" data-burn="4.5" title="左臂 (正面)"
-                                                    d="M102,80 L120,90 V150 L102,160 Z" />
+                                                    d="m 4.4800253,125.62493 17.5226687,10.81461 52.342908,-29.3295 -0.07504,-20.591137 z"
+                                                    id="path3" />
                                                 <path class="body-part" data-view="front"
-                                                    data-burn-part="right_leg_front" data-trauma-target="leg"
-                                                    data-side-target="right_leg" data-burn="9" title="右腿 (正面)"
-                                                    d="M50,165 L68,165 V280 L50,290 Z" />
+                                                    data-burn-part="right_arm_front" data-trauma-target="hand"
+                                                    data-side-target="right_hand" data-burn="4.5" title="右臂 (正面)"
+                                                    d="M 195.78946,124.75969 178.31932,135.65897 125.8351,106.58308 125.8106,85.991827 Z"
+                                                    id="path4" />
                                                 <path class="body-part" data-view="front"
                                                     data-burn-part="left_leg_front" data-trauma-target="leg"
                                                     data-side-target="left_leg" data-burn="9" title="左腿 (正面)"
-                                                    d="M82,165 L100,165 V280 L82,290 Z" />
-                                                <text x="35" y="125" class="svg-label">R</text>
-                                                <text x="115" y="125" class="svg-label">L</text>
+                                                    d="m 33.902076,280.92208 -15.68589,-8.82909 56.408084,-100.21541 20.590938,0.11467 z"
+                                                    id="path5" />
+                                                <path class="body-part" data-view="front"
+                                                    data-burn-part="right_leg_front" data-trauma-target="leg"
+                                                    data-side-target="right_leg" data-burn="9" title="右腿 (正面)"
+                                                    d="m 165.66909,281.57566 15.73693,-8.73781 -55.82495,-100.54142 -20.59126,-0.005 z"
+                                                    id="path6" />
+                                                <text x="50.924438" y="170.00002" class="svg-label" id="text6"
+                                                    style="font-size:42.0169px;stroke-width:3.50141">R</text>
+                                                <text x="145.92444" y="170.00002" class="svg-label" id="text7"
+                                                    style="font-size:42.0169px;stroke-width:3.50141">L</text>
+                                                <text x="175" y="30" class="svg-label" id="text8"
+                                                    style="font-size:35px;stroke-width:3.50141">F</text>
                                             </g>
                                         </svg>
                                     </div>
@@ -164,31 +179,44 @@
                                 <div class="col-6 text-center">
                                     <h4>背面 Back</h4>
                                     <div class="body-diagram-container">
-                                        <svg id="body-diagram-back" class="body-diagram" viewBox="0 0 150 300"
+                                        <svg id="body-diagram-back" class="body-diagram" viewBox="0 0 200 300"
                                             xmlns="http://www.w3.org/2000/svg">
-                                            <g class="body-parts-group">
+                                            <g class="body-parts-group" id="g7">
                                                 <path class="body-part" data-view="back"
                                                     data-burn-part="head_face_neck_back" data-trauma-target="face"
                                                     data-side-target="face" data-burn="4.5" title="頭/頸 (背面)"
-                                                    d="M60,45 A30,30 0 1,1 90,45 V55 A15,15 0 0,0 75,70 A15,15 0 0,0 60,55 Z" />
+                                                    d="m 85,55.980762 a 30,30 0 1 1 30,0 v 10 a 15,15 0 0 0 -15,15 15,15 0 0 0 -15,-15 z"
+                                                    id="path1" />
                                                 <path class="body-part" data-view="back" data-burn-part="torso_back"
                                                     data-trauma-target="chest" data-side-target="chest" data-burn="18"
-                                                    title="軀幹 (背面)" d="M50,75 H100 V160 H50 Z" />
+                                                    title="軀幹 (背面)" d="m 75,85.980762 h 50 V 170.98076 H 75 Z"
+                                                    id="path2" />
                                                 <path class="body-part" data-view="back" data-burn-part="left_arm_back"
                                                     data-trauma-target="hand" data-side-target="left_hand"
-                                                    data-burn="4.5" title="左臂 (背面)" d="M48,80 L30,90 V150 L48,160 Z" />
+                                                    data-burn="4.5" title="左臂 (背面)"
+                                                    d="m 4.4800253,125.62493 17.5226687,10.81461 52.342908,-29.3295 -0.07504,-20.591137 z"
+                                                    id="path3" />
                                                 <path class="body-part" data-view="back" data-burn-part="right_arm_back"
                                                     data-trauma-target="hand" data-side-target="right_hand"
                                                     data-burn="4.5" title="右臂 (背面)"
-                                                    d="M102,80 L120,90 V150 L102,160 Z" />
+                                                    d="M 195.78946,124.75969 178.31932,135.65897 125.8351,106.58308 125.8106,85.991827 Z"
+                                                    id="path4" />
                                                 <path class="body-part" data-view="back" data-burn-part="left_leg_back"
                                                     data-trauma-target="leg" data-side-target="left_leg" data-burn="9"
-                                                    title="左腿 (背面)" d="M50,165 L68,165 V280 L50,290 Z" />
+                                                    title="左腿 (背面)"
+                                                    d="m 33.902076,280.92208 -15.68589,-8.82909 56.408084,-100.21541 20.590938,0.11467 z"
+                                                    id="path5" />
                                                 <path class="body-part" data-view="back" data-burn-part="right_leg_back"
                                                     data-trauma-target="leg" data-side-target="right_leg" data-burn="9"
-                                                    title="右腿 (背面)" d="M82,165 L100,165 V280 L82,290 Z" />
-                                                <text x="35" y="125" class="svg-label">L</text>
-                                                <text x="115" y="125" class="svg-label">R</text>
+                                                    title="右腿 (背面)"
+                                                    d="m 165.66909,281.57566 15.73693,-8.73781 -55.82495,-100.54142 -20.59126,-0.005 z"
+                                                    id="path6" />
+                                                <text x="50.924438" y="170.00002" class="svg-label" id="text6"
+                                                    style="font-size:42.0169px;stroke-width:3.50141">L</text>
+                                                <text x="145.92444" y="170.00002" class="svg-label" id="text7"
+                                                    style="font-size:42.0169px;stroke-width:3.50141">R</text>
+                                                <text x="175" y="30" class="svg-label" id="text8"
+                                                    style="font-size:35px;stroke-width:3.50141">B</text>
                                             </g>
                                         </svg>
                                     </div>

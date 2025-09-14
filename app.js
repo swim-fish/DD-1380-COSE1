@@ -224,14 +224,14 @@ function openTraumaModal(mainPart, clickedView, sideTarget) {
     const modalBody = document.getElementById('traumaModalBody');
     const partData = traumaMap[mainPart];
 
-    modalLabel.textContent = `詳細創傷部位 - ${partData.front ? partData.front.title : (partData.back ? partData.back.title : '')}`;
-    
     let tabsHTML = '';
     let contentHTML = '';
     
     const defaultView = partData.front ? 'front' : 'back';
     const activeView = partData[clickedView] ? clickedView : defaultView;
-    
+
+    modalLabel.textContent = `詳細創傷部位 - ${ activeView === 'front' ? partData.front.title : partData.back.title }`;
+
     const generateSvgContent = (view) => {
         if (!partData[view] || !partData[view].svg) return '';
         return partData[view].svg.replace(/id="trauma-(hand|leg|face|chest|buttocks)-/g, `id="trauma-${sideTarget}-`);
